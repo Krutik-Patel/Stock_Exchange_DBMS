@@ -117,7 +117,7 @@ public class ParticipantDAO_JDBC implements ParticipantDAO {
 		
 		PreparedStatement preparedStatement = null;																																																																																																																																													
 		String sql;
-		sql = "update Participant set regs_date=?,pan_no=? where regs_id = "+ participant.get_regs_id();
+		sql = "update Participants set regs_date=?,pan_no=? where regs_id = "+ participant.get_regs_id();
 		try {
 			preparedStatement = dbConnection.prepareStatement(sql);
  

@@ -1,7 +1,8 @@
 package DAO;
-import Tables.*;
 import java.lang.*;
 import java.util.List;
+
+import Table.*;
 
 public interface ParticipantDAO {
 	public Participants getParticipantByKey(int regs_id);

@@ -1,3 +1,4 @@
+package Tables;
 public class NormalStock {
     int normal_stk_id;
     int stk_comp_id;

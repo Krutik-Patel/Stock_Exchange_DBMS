@@ -1,7 +1,6 @@
 import DAO.*;
 import DAO_JDBC.*;
-import Tables.*;
-import java.lang.*;
+
 import java.sql.*;
 /*
 	Methods to be called in the following order:
