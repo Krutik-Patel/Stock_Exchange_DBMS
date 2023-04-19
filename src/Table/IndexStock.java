@@ -1,4 +1,6 @@
+
 package Table;
+
 public class IndexStock {
     int index_stk_id;
     int stock_quant;

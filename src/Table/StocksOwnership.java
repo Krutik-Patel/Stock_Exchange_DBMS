@@ -1,4 +1,6 @@
+
 package Table;
+
 public class StocksOwnership {
     int stck_id;
     int owner_id;

@@ -1,4 +1,6 @@
+
 package Table;
+
 public class Stock {
     int stock_id;
     String stock_name;
