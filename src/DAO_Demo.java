@@ -1,7 +1,7 @@
 //STEP 1. Import required packages
 import DAO.*;
 import DAO_JDBC.*;
-import Tables.*;
+import Table.*;
 import java.sql.*;
 import java.util.Date;
 import java.text.SimpleDateFormat;
