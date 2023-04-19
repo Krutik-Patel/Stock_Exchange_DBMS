@@ -1,3 +1,4 @@
+package Table;
 public class Accounts {
     int account_id;
     int holder_regs_id;
