@@ -1,5 +1,5 @@
 package DAO;
-import Tables.*;
+import Table.*;
 
 public interface NormalStockDAO {
     public NormalStock getNormalStockByKey(int normal_stk_id);

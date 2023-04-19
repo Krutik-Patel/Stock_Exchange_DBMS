@@ -1,5 +1,5 @@
 package DAO;
-import Tables.*;
+import Table.*;
 
 public interface DomainDAO {
     public Domain getDomainByKey(int domain_id);

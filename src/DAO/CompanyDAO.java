@@ -1,5 +1,5 @@
 package DAO;
-import Tables.*;
+import Table.*;
 
 public interface CompanyDAO {
     public Company getCompanyByKey(int company_id);

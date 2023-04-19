@@ -1,5 +1,5 @@
 package DAO;
-import Tables.*;
+import Table.*;
 
 public interface TransactionDAO {
     public Transaction getTransactionByKey(int trans_id);

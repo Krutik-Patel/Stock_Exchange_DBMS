@@ -1,5 +1,5 @@
 package DAO;
-import Tables.*;
+import Table.*;
 
 public interface IndexStockDAO {
     public IndexStock getIndexStockByKey(int index_stk_id);

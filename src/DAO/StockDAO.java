@@ -1,5 +1,5 @@
 package DAO;
-import Tables.*;
+import Table.*;
 
 public interface StockDAO {
     public Stock getStockByKey(int stock_id);

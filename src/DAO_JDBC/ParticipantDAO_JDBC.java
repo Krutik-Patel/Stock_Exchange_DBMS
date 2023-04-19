@@ -1,6 +1,6 @@
 package DAO_JDBC;
 import DAO.ParticipantDAO;
-import Tables.*;
+import Table.*;
 import java.util.Date;
 import java.sql.*;
 

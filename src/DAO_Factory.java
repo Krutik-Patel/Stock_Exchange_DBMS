@@ -1,6 +1,6 @@
 import DAO.*;
 import DAO_JDBC.*;
-import Tables.*;
+import Table.*;
 import java.lang.*;
 import java.sql.*;
 /*

@@ -1,6 +1,6 @@
 package DAO_JDBC;
 import DAO.StockDAO;
-import Tables.*;
+import Table.*;
 
 import java.sql.*;
 

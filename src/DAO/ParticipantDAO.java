@@ -1,5 +1,5 @@
 package DAO;
-import Tables.*;
+import Table.*;
 // import java.lang.*;
 // import java.util.List;
 
