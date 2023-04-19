@@ -1,3 +1,6 @@
+package DAO;
+import Tables.*;
+
 public interface StockDAO {
     public Stock getStockByKey(int stock_id);
 	public void addStock(Stock stock) throws Exception;

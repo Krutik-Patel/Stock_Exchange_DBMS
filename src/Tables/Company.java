@@ -1,3 +1,4 @@
+package Tables;
 public class Company {
     int company_id;
     String company_name;

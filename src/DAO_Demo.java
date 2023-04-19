@@ -1,4 +1,7 @@
 //STEP 1. Import required packages
+import DAO.*;
+import DAO_JDBC.*;
+import Tables.*;
 import java.sql.*;
 import java.util.Date;
 import java.text.SimpleDateFormat;
@@ -10,7 +13,7 @@ public class DAO_Demo {
 			daoFactory = new DAO_Factory();
 
 			System.out.println("Running usecase1");
-			usecase_register();
+			usecase_update();
 			System.out.println("......");
 			usecase_display();
 			System.out.println();
@@ -39,7 +42,7 @@ public class DAO_Demo {
 		}
 	}
 	//end main
-	public static void usecase_register() throws Exception
+	public static void usecase_update() throws Exception
 	{
 		Participants s1 = new Participants();
 		User u = new User();
@@ -81,8 +84,8 @@ public class DAO_Demo {
 
 			// Carry out DB operations using DAO
 			ParticipantDAO sdao = daoFactory.getParticipantDAO();
-			sdao.registerUser(s1,u);
-			sdao.registerCompany(s2, c);
+			sdao.updateParticipant(s1);
+			sdao.updateParticipant(s2);
 
 			// End transaction boundary with success
 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.COMMIT );

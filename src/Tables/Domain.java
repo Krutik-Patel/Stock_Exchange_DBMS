@@ -1,3 +1,4 @@
+package Tables;
 public class Domain {
     int domain_id;
     String domain_name;
