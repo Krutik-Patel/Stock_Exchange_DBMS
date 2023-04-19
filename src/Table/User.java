@@ -1,3 +1,6 @@
+
+package Table;
+
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
@@ -16,11 +19,12 @@ public class User {
         fname = f;
         mname = m;
         lname = l;
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-        String strDate = formatter.format(d);
-        dob = strDate;
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");  
+		String strDate= formatter.format(d); 
+		dob = strDate;
     }
 
+    
     public int get_user_id() {
         return user_id;
     }

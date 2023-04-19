@@ -27,4 +27,5 @@ public class Company {
     public void set_company_name(String n) {
         company_name = n;
     }
+
 }
