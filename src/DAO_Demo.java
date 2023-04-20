@@ -12,8 +12,10 @@ public class DAO_Demo {
 		try{
 			daoFactory = new DAO_Factory();
 
-			System.out.println("Running usecase");
-			usecase_register();
+			System.out.println("Running Registration");
+			usecase_display();
+			System.out.println("......");
+			usecase_register_user();
 			System.out.println("......");
 			usecase_display();
 			System.out.println();
@@ -32,12 +34,12 @@ public class DAO_Demo {
 		}
 	}
 	//end main
-	public static void usecase_register() throws Exception
+	public static void usecase_register_user() throws Exception
 	{
 		Participants s1 = new Participants();
-
+		User u1 = new User();
 		
-		Participants s2 = new Participants();
+		// Participants s2 = new Participants();
 		
 
 		// User def
@@ -45,21 +47,30 @@ public class DAO_Demo {
 		String d = "13/08/2023";
 		Date date =new SimpleDateFormat("dd/MM/yyyy").parse(d);
 
-		s1.set_regs_id(8);
+		String d1 = "24/05/2001";
+		Date dob =new SimpleDateFormat("dd/MM/yyyy").parse(d1);
+
+		s1.set_regs_id(10);
 		s1.set_regs_date(date);
-		s1.set_pan_no("9998887");
+		s1.set_pan_no("99988990");
+
+		u1.set_user_id(10);
+		u1.set_fname("Why");
+		u1.set_mname("are");
+		u1.set_lname("you");
+		u1.set_dob(dob);
 
 		
 
 
 		// Company def
 
-		String d1 = "13/08/2026";
-		Date date1 =new SimpleDateFormat("dd/MM/yyyy").parse(d1);
+		// String d2 = "13/08/2026";
+		// Date date1 =new SimpleDateFormat("dd/MM/yyyy").parse(d2);
 
-		s2.set_regs_id(9);
-		s2.set_regs_date(date1);
-		s2.set_pan_no("6668887");
+		// s2.set_regs_id(9);
+		// s2.set_regs_date(date1);
+		// s2.set_pan_no("6668887");
 
 		
 
@@ -69,9 +80,9 @@ public class DAO_Demo {
 
 			// Carry out DB operations using DAO
 			ParticipantDAO sdao = daoFactory.getParticipantDAO();
-			sdao.updateParticipant(s1);
-			sdao.updateParticipant(s2);
-
+			UserDAO udao = daoFactory.getUserDAO();
+			sdao.addParticipant(s1);;
+			udao.addUser(u1);
 			// End transaction boundary with success
 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.COMMIT );
 		}catch(Exception e){
@@ -81,30 +92,7 @@ public class DAO_Demo {
 		}
 	}
 	
-	// public static void usecase_insert2()
-	// {
-	// 	Student s1 = new Student();
-	// 	Student s2 = new Student();
-	// 	Student s3 = new Student();
 
-	// 	s1.setid(1001);
-	// 	s1.setName("name-1001");
-	// 	s2.setid(1003);
-	// 	s2.setName("name-1003");
-	// 	s3.setid(1003);
-	// 	s3.setName("name-1004");
-
-	// 	try{
-	// 		daoFactory.activateConnection();
-	// 		StudentDAO sdao = daoFactory.getStudentDAO();
-	// 		sdao.addStudent(s1);
-	// 		sdao.addStudent(s2);
-	// 		daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.COMMIT );
-	// 	}catch(Exception e){
-	// 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.ROLLBACK );
-	// 			e.printStackTrace();
-	// 	}
-	// }
 
 
 

@@ -25,6 +25,8 @@ public class DAO_Factory {
 	// You can add additional DAOs here as needed
 	ParticipantDAO participantDAO = null;
 	StockDAO stockDAO = null;
+	CompanyDAO companyDAO = null;
+	UserDAO userDAO = null;
 
 	boolean activeConnection = false;
 
@@ -74,6 +76,26 @@ public class DAO_Factory {
 		return stockDAO;
 	}
 
+	public CompanyDAO getCompanyDAO() throws Exception {
+		if (activeConnection == false)
+			throw new Exception("Connection not activated...");
+
+		if (companyDAO == null)
+			companyDAO = new CompanyDAO_JDBC(dbconnection);
+
+		return companyDAO;
+	}
+
+	public UserDAO getUserDAO() throws Exception {
+		if (activeConnection == false)
+			throw new Exception("Connection not activated...");
+
+		if (userDAO == null)
+			userDAO = new UserDAO_JDBC(dbconnection);
+
+		return userDAO;
+	}
+
 	public void deactivateConnection(TXN_STATUS txn_status) {
 		// Okay to keep deactivating an already deactivated connection
 		activeConnection = false;
@@ -90,6 +112,8 @@ public class DAO_Factory {
 				// Nullify all DAO objects
 				participantDAO = null;
 				stockDAO = null;
+				userDAO = null;
+				companyDAO = null;
 			} catch (SQLException ex) {
 				// handle any errors
 				System.out.println("SQLException: " + ex.getMessage());
