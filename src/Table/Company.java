@@ -7,9 +7,9 @@ public class Company {
     public Company() {
     }
 
-    public Company(int c, String n) {
-        company_id = c;
-        company_name = n;
+    public Company(int compID, String compName) {
+        company_id = compID;
+        company_name = compName;
     }
 
     public int get_company_id() {
@@ -20,12 +20,12 @@ public class Company {
         return company_name;
     }
 
-    public void set_company_id(int c) {
-        company_id = c;
+    public void set_company_id(int compID) {
+        company_id = compID;
     }
 
-    public void set_company_name(String n) {
-        company_name = n;
+    public void set_company_name(String compName) {
+        company_name = compName;
     }
 
 }

@@ -17,14 +17,17 @@ public class DAO_Factory {
 	};
 
 	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-	static final String DB_URL = "jdbc:mysql://localhost:3306/stock_market?characterEncoding=latin1&useConfigs=maxPerformance";
+	static final String DB_URL = "jdbc:mysql://localhost:3306/stockdb?characterEncoding=latin1&useConfigs=maxPerformance";
 	static final String USER = "root";
-	static final String PASS = "142002";
+	static final String PASS = "password";
 	Connection dbconnection = null;
 
 	// You can add additional DAOs here as needed
 	ParticipantDAO participantDAO = null;
 	StockDAO stockDAO = null;
+	CompanyDAO companyDAO = null;
+	UserDAO userDAO = null;
+
 
 	boolean activeConnection = false;
 
@@ -72,6 +75,26 @@ public class DAO_Factory {
 			stockDAO = new StockDAO_JDBC(dbconnection);
 
 		return stockDAO;
+	}
+
+	public CompanyDAO getCompanyDAO() throws Exception {
+		if (activeConnection == false)
+			throw new Exception("Connection not activated...");
+
+		if (companyDAO == null)
+			companyDAO = new CompanyDAO_JDBC(dbconnection);
+
+		return companyDAO;
+	}
+
+	public UserDAO getUserDAO() throws Exception {
+		if (activeConnection == false)
+			throw new Exception("Connection not activated...");
+
+		if (userDAO == null)
+			userDAO = new UserDAO_JDBC(dbconnection);
+
+		return userDAO;
 	}
 
 	public void deactivateConnection(TXN_STATUS txn_status) {

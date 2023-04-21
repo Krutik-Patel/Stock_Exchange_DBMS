@@ -1,175 +1,184 @@
-//STEP 1. Import required packages
 import DAO.*;
-
 import Table.*;
-
 import java.util.Date;
+import java.util.Scanner;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+
 
 public class DAO_Demo {
-	public static DAO_Factory daoFactory;
+	private static DAO_Factory daoFactory;
+	private static int participantNum;
 	public static void main(String[] args) throws Exception {
 		try{
+
 			daoFactory = new DAO_Factory();
-
-			System.out.println("Running usecase");
-			usecase_register();
-			System.out.println("......");
-			usecase_display();
-			System.out.println();
-
-			
-
-			// System.out.println("Running usecase_delete");
-			// usecase_delete();
-			// System.out.println("......");
-			// usecase_display();
-			// System.out.println();
+			inputHandler();
 
 		}catch(Exception e){
 				//Handle errors for Class.forName
 				e.printStackTrace();
 		}
 	}
+	private static int generateParticipantID() {
+		try {
+			daoFactory.activateConnection();
+			int generatedID = daoFactory.getParticipantDAO().getTotalParticipants() + 1;			
+			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.COMMIT );
+			return generatedID;
+		} catch (Exception e) {
+			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.ROLLBACK );
+			e.printStackTrace();
+			return -1;
+		}
+	}
 	//end main
-	public static void usecase_register() throws Exception
-	{
-		Participants s1 = new Participants();
-
-		
-		Participants s2 = new Participants();
-		
-
-		// User def
-
-		String d = "13/08/2023";
-		Date date =new SimpleDateFormat("dd/MM/yyyy").parse(d);
-
-		s1.set_regs_id(8);
-		s1.set_regs_date(date);
-		s1.set_pan_no("9998887");
-
-		
-
-
-		// Company def
-
-		String d1 = "13/08/2026";
-		Date date1 =new SimpleDateFormat("dd/MM/yyyy").parse(d1);
-
-		s2.set_regs_id(9);
-		s2.set_regs_date(date1);
-		s2.set_pan_no("6668887");
-
-		
-
-		try{
+	public static void registerUser(String fname, String mname, String lname, String dob, String panNo) throws Exception {
+		Date currDate = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-mm-yyyy");
+		Date dateOfBirth = sdf.parse(dob);
+		participantNum = generateParticipantID();
+		Participants newParticipant = new Participants(participantNum, panNo, currDate);
+		User newUser = new User(participantNum, fname, mname, lname, dateOfBirth);
+		try {
 			// Start transaction boundary
 			daoFactory.activateConnection();
 
-			// Carry out DB operations using DAO
+			// Insert participant
 			ParticipantDAO sdao = daoFactory.getParticipantDAO();
-			sdao.updateParticipant(s1);
-			sdao.updateParticipant(s2);
+			UserDAO udao = daoFactory.getUserDAO();
+			sdao.addParticipant(newParticipant);
+			udao.addUser(newUser);
 
 			// End transaction boundary with success
 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.COMMIT );
-		}catch(Exception e){
+		} catch(Exception e){
 				// End transaction boundary with failure
 				daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.ROLLBACK );
 				e.printStackTrace();
 		}
 	}
 	
-	// public static void usecase_insert2()
-	// {
-	// 	Student s1 = new Student();
-	// 	Student s2 = new Student();
-	// 	Student s3 = new Student();
+	public static void registerCompany(String companyName, String panNo){
+		Date currDate = new Date();
+		participantNum = generateParticipantID();
+		Participants newParticipant = new Participants(participantNum, panNo, currDate);
+		Company newCompany = new Company(participantNum, companyName);
 
-	// 	s1.setid(1001);
-	// 	s1.setName("name-1001");
-	// 	s2.setid(1003);
-	// 	s2.setName("name-1003");
-	// 	s3.setid(1003);
-	// 	s3.setName("name-1004");
-
-	// 	try{
-	// 		daoFactory.activateConnection();
-	// 		StudentDAO sdao = daoFactory.getStudentDAO();
-	// 		sdao.addStudent(s1);
-	// 		sdao.addStudent(s2);
-	// 		daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.COMMIT );
-	// 	}catch(Exception e){
-	// 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.ROLLBACK );
-	// 			e.printStackTrace();
-	// 	}
-	// }
-
-
-
-
-	public static void usecase_delete()
-	{
-		Participants s1 = new Participants();
-		Participants s2 = new Participants();
-		
-
-		
-		s1.set_regs_id(10);
-		s2.set_regs_id(11);
-		
-
-		try{
+		try {
+			// Start transaction boundary
 			daoFactory.activateConnection();
+
+			// Insert participant
 			ParticipantDAO sdao = daoFactory.getParticipantDAO();
-			
-			sdao.deleteParticipant(s1);
-			sdao.deleteParticipant(s2);
-			
-			
-			
+			CompanyDAO cdao = daoFactory.getCompanyDAO();
+			sdao.addParticipant(newParticipant);
+			cdao.addCompany(newCompany);
 
+			// End transaction boundary with success
 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.COMMIT );
-		}catch(Exception e){
+		} catch(Exception e){
+				// End transaction boundary with failure
 				daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.ROLLBACK );
 				e.printStackTrace();
 		}
 	}
-
-
-	public static void usecase_display()
-	{
-		try{
-			int id;
-
-			daoFactory.activateConnection();
-			ParticipantDAO pdao = daoFactory.getParticipantDAO();
-			StockDAO sdao = daoFactory.getStockDAO();
-
-			id=2;
-			System.out.println("Trying id=" + id);
-			Stock s1 = sdao.getStockByKey(id);
-			if(s1 != null)
-			System.out.println("Stock Name: "+s1.get_stock_name());
-
-			id=9;
-			System.out.println("Trying id=" + id);
-			Participants s2 = pdao.getParticipantByKey(id);
-			if(s2 != null)
-			s2.print();
-
-			id=10;
-			System.out.println("Trying id=" + id);
-			Participants s3 = pdao.getParticipantByKey(id);
-
-			if(s3 != null)
-			s3.print();
-
-			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.COMMIT );
-		}catch(Exception e){
-				daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.ROLLBACK );
-				e.printStackTrace();
-		}
+	
+	public static void analyzeStock(int stockId){
 	}
+
+	public static void buyStock(int stockId, int stockUnits){
+	}
+
+	public static void sellStock(int stockId, int stockUnits){
+	}
+
+	public static void getMarketTrend(){
+	}
+	
+	public static void getTransactionHistory(int regsId){
+	}
+
+	//Input handler
+	public static void inputHandler() throws Exception {
+		//System.out.println();
+		Scanner sc = new Scanner(System.in);
+		System.out.print("Usecase Type : ");
+
+		int usecaseType = sc.nextInt();
+		switch(usecaseType){
+			case 1 :
+			// 1 - Register User
+				System.out.print("First name : ");
+				String fname = sc.next();
+				System.out.print("Middle name : ");
+				String mname = sc.next();
+				System.out.print("Last name : ");
+				String lname = sc.next();
+				System.out.print("Date of birth : ");
+				String dob = sc.next();
+				System.out.print("Pan number : ");
+				String panNo = sc.next();
+				registerUser(fname, mname, lname, dob, panNo);
+				break;
+				
+			case 2 :
+			// 2 - Register Company
+				System.out.print("Company name : ");
+				String companyName = sc.next();
+				System.out.print("Pan number : ");
+				String panNo2 = sc.next();
+				registerCompany(companyName, panNo2);
+				break;
+
+			case 3 :
+			// 3 - Analysis of particular stock
+				System.out.print("Stock ID : ");
+				int stockId3 = sc.nextInt();
+				analyzeStock(stockId3);
+				break;
+
+			case 4 :
+			// 4 - Buy stocks
+				System.out.print("Stock ID : ");
+				int stockId4 = sc.nextInt();
+				System.out.print("No. of stock units to buy : ");
+				int stockUnits4 = sc.nextInt();
+				buyStock(stockId4, stockUnits4);
+				break;
+
+			case 5 :
+			// 5 - Sell stocks
+				System.out.print("Stock ID : ");
+				int stockId5 = sc.nextInt();
+				System.out.print("No. of stock units to sell : ");
+				int stockUnits5 = sc.nextInt();
+				sellStock(stockId5, stockUnits5);
+				break;
+
+			case 6 :
+			// 6 - Market trends
+				getMarketTrend();
+				break;
+
+			case 7 :
+			// 7 - User transaction history
+				System.out.print("Registration ID : ");
+				int regsId = sc.nextInt();
+				getTransactionHistory(regsId);
+				break;
+
+			//case 8 
+			// 8 - Index of domain wise stocks
+
+			default :
+				System.out.print("Wrong usecase type! \n");
+		}
+		sc.close();
+		
+	}
+
+
+
 }//end FirstExample

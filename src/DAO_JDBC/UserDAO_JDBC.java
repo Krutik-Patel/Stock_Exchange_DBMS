@@ -1,32 +1,32 @@
 package DAO_JDBC;
 
-import DAO.ParticipantDAO;
+import DAO.UserDAO;
 import Table.*;
 import java.util.Date;
 import java.sql.*;
 
 import java.text.SimpleDateFormat;
 
-public class ParticipantDAO_JDBC implements ParticipantDAO {
+public class UserDAO_JDBC implements UserDAO {
 
 	Connection dbConnection;
 
-	public ParticipantDAO_JDBC(Connection dbconn) {
+	public UserDAO_JDBC(Connection dbconn) {
 		// JDBC driver name and database URL
 		// Database credentials
 		dbConnection = dbconn;
 	}
 
 	@Override
-	public Participants getParticipantByKey(int regis_id) {
-		Participants p = new Participants();
+	public User getUserByKey(int user_id) {
+		User u = new User();
 		String sql;
 		Statement stmt = null;
 		boolean flag = false;
 
 		try {
 			stmt = dbConnection.createStatement();
-			sql = "select regs_id,regs_date,pan_no from Participants where regs_id = " + regis_id;
+			sql = "select user_id,fname,mname,lname,dob from User where user_id = " + user_id;
 			ResultSet rs = stmt.executeQuery(sql);
 
 			// STEP 5: Extract data from result set
@@ -34,12 +34,16 @@ public class ParticipantDAO_JDBC implements ParticipantDAO {
 			while (rs.next()) {
 				// Retrieve by column name
 				flag = true;
-				int regs_id = rs.getInt("regs_id");
-				Date regs_date = rs.getDate("regs_date");
-				String pan_no = rs.getString("pan_no");
-				p.set_regs_id(regs_id);
-				p.set_regs_date(regs_date);
-				p.set_pan_no(pan_no);
+				int usr_id = rs.getInt("user_id");
+                String fname = rs.getString("fname");
+                String mname = rs.getString("mname");
+                String lname = rs.getString("lname");
+				Date dob = rs.getDate("dob");
+				u.set_user_id(usr_id);
+                u.set_fname(fname);
+                u.set_mname(mname);
+                u.set_lname(lname);
+                u.set_dob(dob);
 				break;
 				// Add exception handling here if more than one row is returned
 			}
@@ -59,30 +63,31 @@ public class ParticipantDAO_JDBC implements ParticipantDAO {
 			return null;
 		}
 
-		return p;
+		return u;
 	}
 
 	@Override
-	public void addParticipant(Participants participant) throws Exception {
+	public void addUser(User User) throws Exception {
 		PreparedStatement preparedStatement = null;
 		String sql;
-		sql = "insert into Participants(regs_id,regs_date,pan_no) values (?,?,?)";
+		sql = "insert into User(user_id,fname,mname,lname,dob) values (?,?,?,?,?)";
 
-		String d = participant.get_regs_date();
+		String d = User.get_dob();
 		Date date = new SimpleDateFormat("dd/MM/yyyy").parse(d);
 
 		try {
 			preparedStatement = dbConnection.prepareStatement(sql);
 
-			preparedStatement.setInt(1, participant.get_regs_id());
-
-			preparedStatement.setDate(2, new java.sql.Date(date.getTime()));
-			preparedStatement.setString(3, participant.get_pan_no());
+			preparedStatement.setInt(1, User.get_user_id());
+			preparedStatement.setString(2, User.get_fname());
+			preparedStatement.setString(3, User.get_mname());
+			preparedStatement.setString(4, User.get_lname());
+			preparedStatement.setDate(5, new java.sql.Date(date.getTime()));
 
 			// execute insert SQL stetement
 			preparedStatement.executeUpdate();
 
-			System.out.println("Participant with ID " + participant.get_regs_id()
+			System.out.println("User with ID " + User.get_user_id()
 					+ ", added to the database");
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
@@ -99,32 +104,34 @@ public class ParticipantDAO_JDBC implements ParticipantDAO {
 	}
 
 	@Override
-	public void updateParticipant(Participants participant) throws Exception {
+	public void updateUser(User User) throws Exception {
 
 		PreparedStatement preparedStatement = null;
 		String sql;
 
-		sql = "update Participants set regs_date=?,pan_no=? where regs_id = "+ participant.get_regs_id();
+		sql = "update User set fname=?,mname=?,lname=?,dob=? where user_id = "+ User.get_user_id();
 
 		
 		try {
 			preparedStatement = dbConnection.prepareStatement(sql);
 
-			String d = participant.get_regs_date();
+			String d = User.get_dob();
 			Date date = new SimpleDateFormat("dd/MM/yyyy").parse(d);
 
-			preparedStatement.setDate(1, new java.sql.Date(date.getTime()));
-			preparedStatement.setString(2, participant.get_pan_no());
+			preparedStatement.setString(1, User.get_fname());
+			preparedStatement.setString(2, User.get_mname());
+			preparedStatement.setString(3, User.get_lname());
+			preparedStatement.setDate(4, new java.sql.Date(date.getTime()));
 
 			// execute update SQL stetement
 			int ret = preparedStatement.executeUpdate();
 
 			if (ret != 0) {
 
-				System.out.println("Participant with regs_id: " + participant.get_regs_id()
+				System.out.println("User with ID: " + User.get_user_id()
 						+ ", updated successfully");
 			} else {
-				System.out.println("Update Failed for regs_id: " + participant.get_regs_id());
+				System.out.println("Update Failed for ID: " + User.get_user_id());
 			}
 
 		} catch (SQLException e) {
@@ -141,24 +148,24 @@ public class ParticipantDAO_JDBC implements ParticipantDAO {
 	}
 
 	@Override
-	public void deleteParticipant(Participants participant) {
+	public void deleteUser(User User) {
 		// Deletion
 		PreparedStatement preparedStatement = null;
 		String sql;
-		sql = "DELETE FROM Participants where regs_id = ?;";
+		sql = "DELETE FROM User where user_id = ?;";
 		try {
 			preparedStatement = dbConnection.prepareStatement(sql);
 
-			preparedStatement.setInt(1, participant.get_regs_id());
+			preparedStatement.setInt(1, User.get_user_id());
 
 			// execute delete SQL stetement
 			int ret = preparedStatement.executeUpdate();
 
 			if (ret != 0) {
-				System.out.println("Participant with id " + participant.get_regs_id()
+				System.out.println("User with id " + User.get_user_id()
 						+ " deleted from the database");
 			} else {
-				System.out.println("Delete Failed for id: " + participant.get_regs_id());
+				System.out.println("Delete Failed for id: " + User.get_user_id());
 			}
 
 		} catch (SQLException e) {
@@ -171,25 +178,6 @@ public class ParticipantDAO_JDBC implements ParticipantDAO {
 			}
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
-		}
-	}
-
-	public int getTotalParticipants() {
-		Statement preparedStatement = null;
-		String sql;
-		sql = "select max(regs_id) from Participants";
-		try {
-			preparedStatement = dbConnection.createStatement();
-
-			// execute delete SQL stetement
-			ResultSet rs = preparedStatement.executeQuery(sql);
-
-			rs.next();
-			int totalPar = rs.getInt("max(regs_id)");
-			return totalPar;
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-			return -1;
 		}
 	}
 
