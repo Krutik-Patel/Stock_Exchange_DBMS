@@ -42,6 +42,7 @@ public class DAO_Demo {
 		Participants newParticipant = new Participants(participantNum, panNo, currDate);
 		User newUser = new User(participantNum, fname, mname, lname, dateOfBirth);
 		try {
+
 			// Start transaction boundary
 			daoFactory.activateConnection();
 
@@ -50,7 +51,6 @@ public class DAO_Demo {
 			UserDAO udao = daoFactory.getUserDAO();
 			sdao.addParticipant(newParticipant);
 			udao.addUser(newUser);
-
 			// End transaction boundary with success
 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.COMMIT );
 		} catch(Exception e){
@@ -60,18 +60,19 @@ public class DAO_Demo {
 		}
 	}
 	
+
 	public static void registerCompany(String companyName, String panNo){
 		Date currDate = new Date();
 		participantNum = generateParticipantID();
 		Participants newParticipant = new Participants(participantNum, panNo, currDate);
 		Company newCompany = new Company(participantNum, companyName);
-
 		try {
 			// Start transaction boundary
 			daoFactory.activateConnection();
 
 			// Insert participant
 			ParticipantDAO sdao = daoFactory.getParticipantDAO();
+
 			CompanyDAO cdao = daoFactory.getCompanyDAO();
 			sdao.addParticipant(newParticipant);
 			cdao.addCompany(newCompany);

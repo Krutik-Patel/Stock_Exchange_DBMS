@@ -3,7 +3,7 @@ package DAO;
 import Table.*;
 
 public interface UserDAO {
-	public Stock getUserByKey(int user_id);
+	public User getUserByKey(int user_id);
 
 	public void addUser(User user) throws Exception;
 

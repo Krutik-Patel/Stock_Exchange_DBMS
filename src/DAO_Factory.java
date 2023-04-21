@@ -28,7 +28,6 @@ public class DAO_Factory {
 	CompanyDAO companyDAO = null;
 	UserDAO userDAO = null;
 
-
 	boolean activeConnection = false;
 
 	public DAO_Factory() {
@@ -113,6 +112,8 @@ public class DAO_Factory {
 				// Nullify all DAO objects
 				participantDAO = null;
 				stockDAO = null;
+				userDAO = null;
+				companyDAO = null;
 			} catch (SQLException ex) {
 				// handle any errors
 				System.out.println("SQLException: " + ex.getMessage());
