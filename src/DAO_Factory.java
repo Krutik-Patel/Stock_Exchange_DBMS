@@ -27,6 +27,7 @@ public class DAO_Factory {
 	StockDAO stockDAO = null;
 	CompanyDAO companyDAO = null;
 	UserDAO userDAO = null;
+	TransactionDAO transactionDAO = null;
 
 	boolean activeConnection = false;
 
@@ -55,6 +56,9 @@ public class DAO_Factory {
 			System.out.println("VendorError: " + ex.getErrorCode());
 		}
 	}
+
+
+	// DAO
 
 	public ParticipantDAO getParticipantDAO() throws Exception {
 		if (activeConnection == false)
@@ -95,6 +99,20 @@ public class DAO_Factory {
 
 		return userDAO;
 	}
+
+	public TransactionDAO getTransactionDAO() throws Exception {
+		if (activeConnection == false)
+			throw new Exception("Connection not activated...");
+
+		if (transactionDAO == null)
+			transactionDAO = new TransactionDAO_JDBC(dbconnection);
+
+		return transactionDAO;
+	}
+
+
+
+	// END
 
 	public void deactivateConnection(TXN_STATUS txn_status) {
 		// Okay to keep deactivating an already deactivated connection
