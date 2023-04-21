@@ -10,4 +10,5 @@ public interface UserDAO {
 	public void updateUser(User user) throws Exception;
 
 	public void deleteUser(User user);
+
 }

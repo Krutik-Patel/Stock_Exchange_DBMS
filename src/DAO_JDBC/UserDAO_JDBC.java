@@ -180,5 +180,4 @@ public class UserDAO_JDBC implements UserDAO {
 			System.out.println(e.getMessage());
 		}
 	}
-
 }

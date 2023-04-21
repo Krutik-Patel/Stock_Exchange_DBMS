@@ -12,4 +12,6 @@ public interface ParticipantDAO {
 
 	public void deleteParticipant(Participants participant);
 
+	public int getTotalParticipants();
+
 }

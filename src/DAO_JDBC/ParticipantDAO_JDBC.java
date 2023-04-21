@@ -174,4 +174,23 @@ public class ParticipantDAO_JDBC implements ParticipantDAO {
 		}
 	}
 
+	public int getTotalParticipants() {
+		Statement preparedStatement = null;
+		String sql;
+		sql = "select max(regs_id) from Participants";
+		try {
+			preparedStatement = dbConnection.createStatement();
+
+			// execute delete SQL stetement
+			ResultSet rs = preparedStatement.executeQuery(sql);
+
+			rs.next();
+			int totalPar = rs.getInt("max(regs_id)");
+			return totalPar;
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			return -1;
+		}
+	}
+
 }

@@ -10,17 +10,17 @@ public class Participants{
 	String pan_no;
 	String regs_date;
 	public Participants() { }
-	public Participants (int r, String p,Date d){ 
-		regs_id = r; 
-		pan_no = p; 
+	public Participants (int regId, String panNo, Date dor) { 
+		regs_id = regId; 
+		pan_no = panNo; 
 		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");  
-		String strDate= formatter.format(d); 
+		String strDate= formatter.format(dor); 
 		regs_date = strDate;
-	 }
+	}
 	public String get_regs_date() { return regs_date; }
-	public void set_regs_date(Date d){ 
+	public void set_regs_date(Date dor) { 
 		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");  
-		String strDate= formatter.format(d);  
+		String strDate= formatter.format(dor);  
 		regs_date = strDate;
 	}
 	public String get_pan_no() { return pan_no;}
