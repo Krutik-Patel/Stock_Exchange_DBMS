@@ -3,10 +3,8 @@ package DAO_JDBC;
 import DAO.CompanyDAO;
 
 import Table.*;
-import java.util.Date;
 import java.sql.*;
 
-import java.text.SimpleDateFormat;
 
 public class CompanyDAO_JDBC implements CompanyDAO {
     
