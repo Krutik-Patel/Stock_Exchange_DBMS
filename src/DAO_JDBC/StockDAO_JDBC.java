@@ -2,7 +2,7 @@ package DAO_JDBC;
 
 import DAO.StockDAO;
 import Table.*;
-
+import Join_Table.*;
 import java.sql.*;
 
 public class StockDAO_JDBC implements StockDAO {
@@ -171,5 +171,56 @@ public class StockDAO_JDBC implements StockDAO {
 			System.out.println(e.getMessage());
 		}
 	}
+
+	@Override
+	public Stock_Analysis get_stock_analysis(int stock_id) throws Exception {
+        Stock_Analysis s = new Stock_Analysis();
+		String sql;
+		Statement stmt = null;
+		boolean flag = false;
+
+		try {
+			stmt = dbConnection.createStatement();
+			sql = "select count(trans_id) as total_transaction,sum(trans_price) as total_trans_price , sum(units) as total_units ,stock_id   from Stock , Transaction where stock_id = stk_id and trans_date > '2023-01-1' and stock_id="+stock_id+ " group by stock_id";
+			ResultSet rs = stmt.executeQuery(sql);
+
+			// STEP 5: Extract data from result set
+
+			while (rs.next()) {
+				// Retrieve by column name
+				flag = true;
+				float total_trans_price = rs.getFloat("total_trans_price");
+				int total_transaction = rs.getInt("total_transaction");
+                int total_units = rs.getInt("total_units");
+                int stk_id = rs.getInt("stock_id");
+              
+				
+                s.set_total_trans_price(total_trans_price);
+				s.set_total_transaction(total_transaction);
+                s.set_total_units(total_units);
+                s.set_stock(getStockByKey(stk_id));
+				
+				break;
+				// Add exception handling here if more than one row is returned
+			}
+			if (rs.next()) {
+				System.out.println("More than one record found for the given regs_id");
+				return null;
+			}
+		} catch (SQLException ex) {
+			// handle any errors
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+		// Add exception handling when there is no matching record
+		if (!flag) {
+			System.out.println("No Record Found");
+			return null;
+		}
+
+		return s;
+	}
+
 
 }
