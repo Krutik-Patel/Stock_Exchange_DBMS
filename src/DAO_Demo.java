@@ -19,6 +19,7 @@ public class DAO_Demo {
 			System.out.println("......");
 			usecase_display();
 			System.out.println();
+			usecase_delete();
 
 			
 
@@ -115,9 +116,6 @@ public class DAO_Demo {
 			sdao.deleteParticipant(s1);
 			sdao.deleteParticipant(s2);
 			
-			
-			
-
 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.COMMIT );
 		}catch(Exception e){
 				daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.ROLLBACK );
