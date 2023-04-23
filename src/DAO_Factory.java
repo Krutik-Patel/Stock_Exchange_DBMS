@@ -28,6 +28,7 @@ public class DAO_Factory {
 	CompanyDAO companyDAO = null;
 	UserDAO userDAO = null;
 	TransactionDAO transactionDAO = null;
+	AccountsDAO accountsDAO = null;
 
 	boolean activeConnection = false;
 
@@ -110,6 +111,16 @@ public class DAO_Factory {
 		return transactionDAO;
 	}
 
+	public AccountsDAO getAccountsDAO() throws Exception {
+		if (activeConnection == false)
+			throw new Exception("Connection not activated...");
+
+		if (accountsDAO == null)
+			accountsDAO = new AccountsDAO_JDBC(dbconnection);
+
+		return accountsDAO;
+	}
+
 
 
 	// END
@@ -132,6 +143,8 @@ public class DAO_Factory {
 				stockDAO = null;
 				userDAO = null;
 				companyDAO = null;
+				transactionDAO = null;
+				accountsDAO = null;
 			} catch (SQLException ex) {
 				// handle any errors
 				System.out.println("SQLException: " + ex.getMessage());

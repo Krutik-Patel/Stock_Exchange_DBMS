@@ -164,3 +164,5 @@ public class CompanyDAO_JDBC implements CompanyDAO {
 		}
 	}
 
+}
+
