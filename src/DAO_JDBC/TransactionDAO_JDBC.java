@@ -2,9 +2,11 @@ package DAO_JDBC;
 
 import DAO.TransactionDAO;
 import Table.*;
+import Join_Table.Transaction_History;
 
 import java.util.Date;
 import java.sql.*;
+import java.util.ArrayList;
 
 import java.text.SimpleDateFormat;
 
@@ -188,6 +190,60 @@ public class TransactionDAO_JDBC implements TransactionDAO {
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}
+	}
+
+
+
+	@Override
+	public ArrayList<Transaction_History> getTransactionHistory(int account_id) {
+		ArrayList<Transaction_History> transList = new ArrayList<>();
+		String sql;
+		Statement stmt = null;
+		boolean flag = false;
+
+		try {
+			stmt = dbConnection.createStatement();
+			sql = "with nwtb as (with tb as ((select concat(fname,' ',mname, ' ',lname) as name, user_id as id from User) union(select company_name as name, company_id as id from Company)) select ts.trans_id as trans_id, tb1.name from_name , tb1.id from_id, tb2.name to_name, tb2.id to_id, stk.stock_name, stk.stock_id, ts.units, ts.trans_date, ts.trans_price from Transaction ts, Accounts t, Accounts t2, tb tb1, tb tb2, Stock stk where ts.acc_id_from = t.account_id and ts.acc_id_to = t2.account_id and tb1.id = t.holder_regs_id and tb2.id = t2.holder_regs_id and ts.stk_id = stk.stock_id) select * from nwtb where from_id ="+account_id+ " or to_id = " + account_id;
+			ResultSet rs = stmt.executeQuery(sql);
+
+			// STEP 5: Extract data from result set
+
+			while (rs.next()) {
+				
+				Transaction_History hist = new Transaction_History();
+				// Retrieve by column name
+				flag = true;
+				int id = rs.getInt("trans_id");
+                String from_name = rs.getString("from_name");
+                String to_name = rs.getString("to_name");
+                String stock_name = rs.getString("stock_name");
+				
+               
+                hist.set_trans(getTransactionByKey(id));
+                hist.set_from_name(from_name);
+				hist.set_to_name(to_name);
+				hist.set_stock_name(stock_name);
+
+				transList.add(hist);
+				
+				
+				// Add exception handling here if more than one row is returned
+			}
+			
+		} catch (SQLException ex) {
+			// handle any errors
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+		// Add exception handling when there is no matching record
+		if (!flag) {
+			System.out.println("No Record Found");
+			return null;
+		}
+		
+		
+		return transList;
 	}
 
     

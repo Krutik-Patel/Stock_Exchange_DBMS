@@ -4,6 +4,7 @@ import DAO.StockDAO;
 import Table.*;
 import Join_Table.*;
 import java.sql.*;
+import java.util.ArrayList;
 
 public class StockDAO_JDBC implements StockDAO {
 
@@ -173,7 +174,7 @@ public class StockDAO_JDBC implements StockDAO {
 	}
 
 	@Override
-	public Stock_Analysis get_stock_analysis(int stock_id) throws Exception {
+	public Stock_Analysis get_stock_analysis(int stock_id,String date) throws Exception {
         Stock_Analysis s = new Stock_Analysis();
 		String sql;
 		Statement stmt = null;
@@ -181,7 +182,7 @@ public class StockDAO_JDBC implements StockDAO {
 
 		try {
 			stmt = dbConnection.createStatement();
-			sql = "select count(trans_id) as total_transaction,sum(trans_price) as total_trans_price , sum(units) as total_units ,stock_id   from Stock , Transaction where stock_id = stk_id and trans_date > '2023-01-1' and stock_id="+stock_id+ " group by stock_id";
+			sql = "select count(trans_id) as total_transaction,sum(trans_price) as total_trans_price , sum(units) as total_units ,stock_id   from Stock , Transaction where stock_id = stk_id and trans_date > "+ date +" and stock_id="+stock_id+ " group by stock_id";
 			ResultSet rs = stmt.executeQuery(sql);
 
 			// STEP 5: Extract data from result set
@@ -200,7 +201,6 @@ public class StockDAO_JDBC implements StockDAO {
                 s.set_total_units(total_units);
                 s.set_stock(getStockByKey(stk_id));
 				
-				break;
 				// Add exception handling here if more than one row is returned
 			}
 			if (rs.next()) {
@@ -221,6 +221,43 @@ public class StockDAO_JDBC implements StockDAO {
 
 		return s;
 	}
+	
+	public ArrayList<Market_Trend> get_market_trend(String start_date, String end_date) throws Exception {
+		ArrayList<Market_Trend> markTrendList = new ArrayList<>();
+		String sql = "with stkvw as (select st.stock_id, IFNULL(tb.trans_price/tb.units, st.stock_price) as past_price, st.stock_price curr_price, st.stock_name, ROW_NUMBER() over(partition by st.stock_id order by trans_date) as row_no from Stock st left join (select * from Transaction t where trans_date between \"" + start_date +"\" and \"" + end_date + "\" order by trans_date) tb on st.stock_id = tb.stk_id) select stock_name, stock_id, past_price as prev_price, curr_price from stkvw where row_no = 1";
+		
+		Statement stmt = null;
+
+		try {
+			stmt = dbConnection.createStatement();
+			
+			ResultSet rs = stmt.executeQuery(sql);
+
+			// STEP 5: Extract data from result set
+
+			while (rs.next()) {
+				// Retrieve by column name
+				Market_Trend market_Trend = new Market_Trend();
+				String stock_name = rs.getString("stock_name");
+				int stock_id = rs.getInt("stock_id");
+				float prev_price = rs.getFloat("prev_price");
+				float curr_price = rs.getFloat("curr_price");
 
 
+				market_Trend.set_curr_price(curr_price);
+				market_Trend.set_stock_id(stock_id);
+				market_Trend.set_stock_name(stock_name);
+				market_Trend.set_prev_price(prev_price);
+				markTrendList.add(market_Trend);
+			}
+		
+		} catch (SQLException ex) {
+			// handle any errors
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+
+		return markTrendList;
+	}
 }

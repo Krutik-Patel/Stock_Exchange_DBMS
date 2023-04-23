@@ -1,32 +1,32 @@
 package DAO_JDBC;
 
-import DAO.ParticipantDAO;
+import DAO.AccountsDAO;
+
+
 import Table.*;
-import java.util.Date;
 import java.sql.*;
 
-import java.text.SimpleDateFormat;
 
-public class ParticipantDAO_JDBC implements ParticipantDAO {
-
+public class AccountsDAO_JDBC implements  AccountsDAO {
+    
 	Connection dbConnection;
 
-	public ParticipantDAO_JDBC(Connection dbconn) {
+	public AccountsDAO_JDBC(Connection dbconn) {
 		// JDBC driver name and database URL
 		// Database credentials
 		dbConnection = dbconn;
 	}
 
 	@Override
-	public Participants getParticipantByKey(int regis_id) {
-		Participants p = new Participants();
+	public Accounts getAccountByKey(int acc_id) {
+		Accounts c = new Accounts();
 		String sql;
 		Statement stmt = null;
 		boolean flag = false;
 
 		try {
 			stmt = dbConnection.createStatement();
-			sql = "select regs_id,regs_date,pan_no from Participants where regs_id = " + regis_id;
+			sql = "select account_id,holder_regs_id,password,bank_acc_no from Accounts where account_id = " + acc_id;
 			ResultSet rs = stmt.executeQuery(sql);
 
 			// STEP 5: Extract data from result set
@@ -34,17 +34,21 @@ public class ParticipantDAO_JDBC implements ParticipantDAO {
 			while (rs.next()) {
 				// Retrieve by column name
 				flag = true;
-				int regs_id = rs.getInt("regs_id");
-				Date regs_date = rs.getDate("regs_date");
-				String pan_no = rs.getString("pan_no");
-				p.set_regs_id(regs_id);
-				p.set_regs_date(regs_date);
-				p.set_pan_no(pan_no);
+				int account_id = rs.getInt("account_id");
+                int holder_regs_id = rs.getInt("holder_regs_id");
+                String password = rs.getString("password");
+                String bank_acc_no = rs.getString("bank_acc_no");
+				
+                c.set_account_id(account_id);
+                c.set_holder_regs_id(holder_regs_id);
+                c.set_password(password);
+                c.set_bank_acc_no(bank_acc_no);
+				
 				break;
 				// Add exception handling here if more than one row is returned
 			}
 			if (rs.next()) {
-				System.out.println("More than one record found for the given regs_id");
+				System.out.println("More than one record found for the given comp_id");
 				return null;
 			}
 		} catch (SQLException ex) {
@@ -59,30 +63,29 @@ public class ParticipantDAO_JDBC implements ParticipantDAO {
 			return null;
 		}
 
-		return p;
+		return c;
 	}
 
 	@Override
-	public void addParticipant(Participants participant) throws Exception {
+	public void addAccount(Accounts accounts) throws Exception {
 		PreparedStatement preparedStatement = null;
 		String sql;
-		sql = "insert into Participants(regs_id,regs_date,pan_no) values (?,?,?)";
+		sql = "insert into Accounts (account_id,holder_regs_id,password,bank_acc_no) values (?,?,?,?)";
 
-		String d = participant.get_regs_date();
-		Date date = new SimpleDateFormat("dd/MM/yyyy").parse(d);
+		
 
 		try {
 			preparedStatement = dbConnection.prepareStatement(sql);
 
-			preparedStatement.setInt(1, participant.get_regs_id());
-
-			preparedStatement.setDate(2, new java.sql.Date(date.getTime()));
-			preparedStatement.setString(3, participant.get_pan_no());
+			preparedStatement.setInt(1, accounts.get_account_id());
+			preparedStatement.setInt(2, accounts.get_holder_regs_id());
+            preparedStatement.setString(3, accounts.get_password());
+            preparedStatement.setString(4, accounts.get_bank_acc_no());
 
 			// execute insert SQL stetement
 			preparedStatement.executeUpdate();
 
-			System.out.println("Participant with ID " + participant.get_regs_id()
+			System.out.println("Accounts with ID " + accounts.get_account_id()
 					+ ", added to the database");
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
@@ -99,32 +102,32 @@ public class ParticipantDAO_JDBC implements ParticipantDAO {
 	}
 
 	@Override
-	public void updateParticipant(Participants participant) throws Exception {
+	public void updateAccount(Accounts accounts) throws Exception {
 
 		PreparedStatement preparedStatement = null;
 		String sql;
 
-		sql = "update Participants set regs_date=?,pan_no=? where regs_id = "+ participant.get_regs_id();
+		sql = "update Accounts set holder_regs_id=?,password=?,bank_acc_no=? where account_id = "+ accounts.get_account_id();
 
 		
 		try {
 			preparedStatement = dbConnection.prepareStatement(sql);
 
-			String d = participant.get_regs_date();
-			Date date = new SimpleDateFormat("dd/MM/yyyy").parse(d);
+			
+			preparedStatement.setInt(1, accounts.get_holder_regs_id());
+            preparedStatement.setString(2, accounts.get_password());
+            preparedStatement.setString(3, accounts.get_bank_acc_no());
 
-			preparedStatement.setDate(1, new java.sql.Date(date.getTime()));
-			preparedStatement.setString(2, participant.get_pan_no());
 
 			// execute update SQL stetement
 			int ret = preparedStatement.executeUpdate();
 
 			if (ret != 0) {
 
-				System.out.println("Participant with regs_id: " + participant.get_regs_id()
+				System.out.println("Accounts with ID: " + accounts.get_account_id()
 						+ ", updated successfully");
 			} else {
-				System.out.println("Update Failed for regs_id: " + participant.get_regs_id());
+				System.out.println("Update Failed for ID: " + accounts.get_account_id());
 			}
 
 		} catch (SQLException e) {
@@ -141,24 +144,24 @@ public class ParticipantDAO_JDBC implements ParticipantDAO {
 	}
 
 	@Override
-	public void deleteParticipant(Participants participant) {
+	public void deleteAccount(Accounts accounts) {
 		// Deletion
 		PreparedStatement preparedStatement = null;
 		String sql;
-		sql = "DELETE FROM Participants where regs_id = ?;";
+		sql = "DELETE FROM Accounts where account_id = ?;";
 		try {
 			preparedStatement = dbConnection.prepareStatement(sql);
 
-			preparedStatement.setInt(1, participant.get_regs_id());
+			preparedStatement.setInt(1, accounts.get_account_id());
 
 			// execute delete SQL stetement
 			int ret = preparedStatement.executeUpdate();
 
 			if (ret != 0) {
-				System.out.println("Participant with id " + participant.get_regs_id()
+				System.out.println("Accounts with ID " + accounts.get_account_id()
 						+ " deleted from the database");
 			} else {
-				System.out.println("Delete Failed for id: " + participant.get_regs_id());
+				System.out.println("Delete Failed for ID: " + accounts.get_account_id());
 			}
 
 		} catch (SQLException e) {
@@ -174,10 +177,10 @@ public class ParticipantDAO_JDBC implements ParticipantDAO {
 		}
 	}
 
-	public int getNextID() {
+    public int getNextID() {
 		Statement preparedStatement = null;
 		String sql;
-		sql = "select max(regs_id) from Participants";
+		sql = "select max(account_id) from Accounts";
 		try {
 			preparedStatement = dbConnection.createStatement();
 
@@ -185,12 +188,12 @@ public class ParticipantDAO_JDBC implements ParticipantDAO {
 			ResultSet rs = preparedStatement.executeQuery(sql);
 
 			rs.next();
-			int totalPar = rs.getInt("max(regs_id)");
-			return totalPar;
+			int totalAcc = rs.getInt("max(account_id)");
+			return totalAcc;
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 			return -1;
 		}
 	}
-
 }
+
