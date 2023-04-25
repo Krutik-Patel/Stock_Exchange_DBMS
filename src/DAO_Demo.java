@@ -10,7 +10,7 @@ public class DAO_Demo {
 	private static DAO_Factory daoFactory;
 	private static HashMap<Integer, ArrayList<Thrie>> buyerHash = new HashMap<>();
 	private static HashMap<Integer, ArrayList<Thrie>> sellerHash = new HashMap<>();
-	
+	private static int responces = 0;
 
 	public static void initialize() throws Exception {
 		try{
@@ -231,9 +231,10 @@ public class DAO_Demo {
 			if (!sellerHash.containsKey(stockId)) {
 				ArrayList<Thrie> newLst = new ArrayList<>();
 				sellerHash.put(stockId, newLst);
-			} if (!sellerHash.get(stockId).isEmpty()) {
+			} 
+			if (!sellerHash.get(stockId).isEmpty()) {
 				ArrayList<Thrie> selLst = sellerHash.get(stockId);
-				while (qtyBought < stockUnits || !selLst.isEmpty()) {
+				while (qtyBought < stockUnits && !selLst.isEmpty()) {
 					Thrie seller = selLst.get(0);
 					if ((stockUnits - qtyBought) < seller.getStockUnits()) {
 						int avail = seller.getStockUnits();
@@ -259,6 +260,7 @@ public class DAO_Demo {
 					StocksOwnership buyerSO = sodao.getStocksOnwershipByKey(stockId, accountID);
 					if (buyerSO != null) {
 						buyerSO.set_units_owned(buyerSO.get_units_owned() + qtyBought);
+						sodao.updateStockOwnership(buyerSO);
 					} else {
 						buyerSO = new StocksOwnership(stockId, accountID, qtyBought);
 						sodao.addStocksOwnership(buyerSO);
@@ -285,6 +287,7 @@ public class DAO_Demo {
 
 	public static String sellStock(int accountID, int stockId, int stockUnits) throws Exception {
 		try {
+			String initStr = "";
 			daoFactory.activateConnection();
 			TransactionDAO tdao = daoFactory.getTransactionDAO();
 			StockDAO sdao = daoFactory.getStockDAO();
@@ -292,41 +295,51 @@ public class DAO_Demo {
 			
 			float stkprice = sdao.getStockByKey(stockId).get_stock_price();
 
+			StocksOwnership stkOnshp = sodao.getStocksOnwershipByKey(stockId, stockUnits);
+			if (stkOnshp == null) {
+				return "You don't own any such stock.";
+			} else if (stkOnshp.get_units_owned() < stockUnits) {
+				stockUnits = stkOnshp.get_units_owned();
+				initStr = "You own lesser that asked. Only can sell " + stockUnits + "units of stocks.\n";
+			}
+
+
 			int qtySold = 0;
-			if (!sellerHash.containsKey(stockId)) {
+			if (!buyerHash.containsKey(stockId)) {
 				ArrayList<Thrie> newLst = new ArrayList<>();
-				sellerHash.put(stockId, newLst);
-			} if (!sellerHash.get(stockId).isEmpty()) {
-				ArrayList<Thrie> selLst = sellerHash.get(stockId);
-				while (qtySold < stockUnits || !selLst.isEmpty()) {
-					Thrie seller = selLst.get(0);
-					if ((stockUnits - qtySold) < seller.getStockUnits()) {
-						int avail = seller.getStockUnits();
-						selLst.get(0).setStockUnits(avail - (stockUnits - qtySold));
+				buyerHash.put(stockId, newLst);
+			} if (!buyerHash.get(stockId).isEmpty()) {
+				ArrayList<Thrie> buyLst = buyerHash.get(stockId);
+				while (qtySold < stockUnits || !buyLst.isEmpty()) {
+					Thrie buyer = buyLst.get(0);
+					if ((stockUnits - qtySold) < buyer.getStockUnits()) {
+						int avail = buyer.getStockUnits();
+						buyer.setStockUnits(avail - (stockUnits - qtySold));
 					
-						Transaction newTrans = new Transaction(0, seller.getaccountID(), accountID, stockId, (stockUnits - qtySold), new Date(), stkprice * (stockUnits - qtySold));
+						Transaction newTrans = new Transaction(0, accountID, buyer.getaccountID(), stockId, (stockUnits - qtySold), new Date(), stkprice * (stockUnits - qtySold));
 						tdao.addTransaction(newTrans);
-						StocksOwnership nwsoshp = new StocksOwnership(stockId, seller.getaccountID(), (avail - (stockUnits - qtySold)));
+						StocksOwnership nwsoshp = new StocksOwnership(stockId, buyer.getaccountID(), (avail - (stockUnits - qtySold)));
 						sodao.updateStockOwnership(nwsoshp);
 						
 						qtySold = stockUnits;
 						
 						break;
-					} else if ((stockUnits - qtySold) >= seller.getStockUnits()) {
-						qtySold += seller.getStockUnits();
-						int qt = Math.min(seller.getStockUnits(), (stockUnits - qtySold));
-						Transaction newTrans = new Transaction(0, seller.getaccountID(), accountID, stockId, qt, new Date(), stkprice * qt);
+					} else if ((stockUnits - qtySold) >= buyer.getStockUnits()) {
+						qtySold += buyer.getStockUnits();
+						int qt = Math.min(buyer.getStockUnits(), (stockUnits - qtySold));
+						Transaction newTrans = new Transaction(0, accountID, buyer.getaccountID(), stockId, qt, new Date(), stkprice * qt);
 						tdao.addTransaction(newTrans);
-						StocksOwnership nwsoshp = new StocksOwnership(stockId, seller.getaccountID(), 0);
+						StocksOwnership nwsoshp = new StocksOwnership(stockId, buyer.getaccountID(), 0);
 						sodao.deleteStockOwnership(nwsoshp);
-						selLst.remove(0);
+						buyLst.remove(0);
 					}
-					StocksOwnership buyerSO = sodao.getStocksOnwershipByKey(stockId, accountID);
-					if (buyerSO != null) {
-						buyerSO.set_units_owned(buyerSO.get_units_owned() + qtySold);
+
+					StocksOwnership sellerSO = sodao.getStocksOnwershipByKey(stockId, accountID);
+					if (sellerSO.get_units_owned() > qtySold) {
+						sellerSO.set_units_owned(sellerSO.get_units_owned() - qtySold);
+						sodao.updateStockOwnership(sellerSO);
 					} else {
-						buyerSO = new StocksOwnership(stockId, accountID, qtySold);
-						sodao.addStocksOwnership(buyerSO);
+						sodao.deleteStockOwnership(sellerSO);
 					}
 				}
 			} else {
@@ -338,7 +351,7 @@ public class DAO_Demo {
 	
 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.COMMIT );
 	
-			return "Stocks bought: " + qtySold + "\nStocks Remaining to buy" + (stockUnits - qtySold) + "\n";
+			return initStr + "Stocks bought: " + qtySold + "\nStocks Remaining to buy" + (stockUnits - qtySold) + "\n";
 			
 		} catch (Exception e) {
 				daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.ROLLBACK );
@@ -353,10 +366,11 @@ public class DAO_Demo {
 		try{
 		
 			daoFactory.activateConnection();
-			
 			StockDAO sdao = daoFactory.getStockDAO();
-			
-			ArrayList<Market_Trend> mark_trend = sdao.get_market_trend("2020-08-01", "2024-12-01");
+
+			String startDate = "", endDate = "";
+			//yaha par modify karana hai
+			ArrayList<Market_Trend> mark_trend = sdao.get_market_trend(startDate, endDate);
 			
 			String result = "";
 			for (Market_Trend t : mark_trend) {
@@ -431,6 +445,7 @@ public class DAO_Demo {
 	}
 	
 	public static String parseResponse(String cliRes) throws Exception{
+		responces++;
 		try{
 			String[] resp = cliRes.split(" ");
 			if(resp[0].equals("1")){

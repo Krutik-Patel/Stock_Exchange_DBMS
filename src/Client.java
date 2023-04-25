@@ -1,7 +1,7 @@
+
 import java.net.*;
 import java.io.*;
 import java.util.Scanner;
-
 public class Client {
   public static void main(String[] args) throws Exception {
   try{
@@ -70,7 +70,7 @@ public class Client {
 					System.out.print("Pan number : ");
 					String panNo = sc.next();
 
-          clientMessage = "3"+fname+" "+mname+" "+lname+" "+dob+" "+panNo;
+          clientMessage = "3 "+fname+" "+mname+" "+lname+" "+dob+" "+panNo;
 					
 
            //SERVER_COMMUNICATION
@@ -102,7 +102,7 @@ public class Client {
 					String panNo2 = sc.next();
 
 
-          clientMessage = "4"+companyName+" "+panNo2;
+          clientMessage = "4 "+companyName+" "+panNo2;
 					
 
 
@@ -141,7 +141,7 @@ public class Client {
 				String bank_acc_no = sc.next();
 				String acc_id;
 
-         clientMessage = "2"+holder_regs_id+" "+password+" "+bank_acc_no;
+         clientMessage = "2 "+holder_regs_id+" "+password+" "+bank_acc_no;
 					
            //SERVER_COMMUNICATION
           outStream.writeUTF(clientMessage);
@@ -208,7 +208,7 @@ public class Client {
 				String panNo = sc.next();
 
 
-		clientMessage = "3"+fname+" "+mname+" "+lname+" "+dob+" "+panNo;
+		clientMessage = "3 "+fname+" "+mname+" "+lname+" "+dob+" "+panNo;
 
          //SERVER_COMMUNICATION
           outStream.writeUTF(clientMessage);
@@ -237,7 +237,7 @@ public class Client {
 				System.out.print("Pan number : ");
 				String panNo2 = sc.next();
 				
-        clientMessage = "4"+companyName+" "+panNo2;
+        clientMessage = "4 "+companyName+" "+panNo2;
 					
 
 
@@ -266,7 +266,7 @@ public class Client {
 				String stockId3 = sc.next();
 				String date = sc.next();
 
-        clientMessage = stockId3+" "+date;
+        clientMessage = "5 "+stockId3+" "+date;
 				
 
            //SERVER_COMMUNICATION
@@ -280,7 +280,7 @@ public class Client {
 
 				    if( msg[0].equals("YES")){
               for(int i=1;i<msg.length;i++){
-                  System.out.println(msg);
+                  System.out.println(msg[i]);
               }
 				    	
 				    }
@@ -298,7 +298,7 @@ public class Client {
 				System.out.print("No. of stock units to buy : ");
 				String stockUnits4 = sc.next();
 
-         clientMessage = stockId4+" "+stockUnits4;
+         clientMessage = "6 "+stockId4+" "+stockUnits4;
 				
 
            //SERVER_COMMUNICATION
@@ -312,7 +312,7 @@ public class Client {
 
 				    if( msg[0].equals("YES")){
               for(int i=1;i<msg.length;i++){
-                  System.out.println(msg);
+                  System.out.println(msg[i]);
               }
 				    	
 				    }
@@ -331,7 +331,7 @@ public class Client {
 				System.out.print("No. of stock units to sell : ");
 				String stockUnits5 = sc.next();
 				
-         clientMessage = stockId5+" "+stockUnits5;
+         clientMessage = "7 "+stockId5+" "+stockUnits5;
 				
 
            //SERVER_COMMUNICATION
@@ -345,7 +345,7 @@ public class Client {
 
 				    if( msg[0].equals("YES")){
               for(int i=1;i<msg.length;i++){
-                  System.out.println(msg);
+                  System.out.println(msg[i]);
               }
 				    	
 				    }
@@ -362,7 +362,7 @@ public class Client {
         System.out.print("Parameter for Market trend(M/D/Y) : ");
 				String parTrend = sc.next();
 
-         clientMessage = parTrend;
+         clientMessage = "8 "+parTrend;
 				
 
            //SERVER_COMMUNICATION
@@ -376,7 +376,7 @@ public class Client {
 
 				    if( msg[0].equals("YES")){
               for(int i=1;i<msg.length;i++){
-                  System.out.println(msg);
+                  System.out.println(msg[i]);
               }
 				    	
 				    }
@@ -390,7 +390,7 @@ public class Client {
 			case 7 :
 			// 7 - User transaction history
 				
-         clientMessage = login_acc_id;
+         clientMessage = "9 "+login_acc_id;
 				
 
            //SERVER_COMMUNICATION
@@ -399,12 +399,11 @@ public class Client {
           serverMessage=inStream.readUTF();
 				  //
 
-
            msg = serverMessage.split(" ");
 
 				    if( msg[0].equals("YES")){
               for(int i=1;i<msg.length;i++){
-                  System.out.println(msg);
+                  System.out.println(msg[i]);
               }
 				    	
 				    }

@@ -42,12 +42,14 @@ class ServerClientThread extends Thread {
       clientNo=counter;
     }
 
+   
+
 
 
     public void run(){
       
       try{
-        
+        daoFactory = new DAO_Factory();
         DataInputStream inStream = new DataInputStream(serverClient.getInputStream());
         DataOutputStream outStream = new DataOutputStream(serverClient.getOutputStream());
         String clientMessage="", serverMessage="";
@@ -56,10 +58,12 @@ class ServerClientThread extends Thread {
           /* CLIENT COMMUNICATION */
           clientMessage=inStream.readUTF();
 
+          System.out.println("CLIENT --------------------------------");
           System.out.println(clientMessage);
           // SERVER MESSAGE
           serverMessage = parseResponse(clientMessage);
 
+          System.out.println("SERVER ---------------------------------");
           System.out.println(serverMessage);
 
           outStream.writeUTF(serverMessage);
@@ -82,10 +86,15 @@ class ServerClientThread extends Thread {
     public static String parseResponse(String cliRes) throws Exception{
 		try{
 			String[] resp = cliRes.split(" ");
+            
+           
       if(resp[0].equals("1")){
           int acc_id = Integer.parseInt(resp[1]);
           String pass = resp[2];
-          return loginAccount(acc_id,pass);
+         
+          String ret = loginAccount(acc_id,pass);
+
+          return ret;
       }
       else if(resp[0].equals("2")){
           int holder_regs_id = Integer.parseInt(resp[1]);
@@ -94,7 +103,7 @@ class ServerClientThread extends Thread {
           return registerAccount(password,holder_regs_id,bank_acc_no);
 
       }
-			if(resp[0].equals("3")){
+			else if(resp[0].equals("3")){
 				String fname = resp[1];
 				String mname = resp[2];
 				String lname = resp[3];
@@ -192,7 +201,7 @@ class ServerClientThread extends Thread {
 			// End transaction boundary with success
 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.COMMIT );
 
-			return String.valueOf(participantNum);
+			return "YES "+String.valueOf(participantNum);
 		} catch(Exception e){
 				// End transaction boundary with failure
 				daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.ROLLBACK );
@@ -223,8 +232,9 @@ class ServerClientThread extends Thread {
 
 			// End transaction boundary with success
 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.COMMIT );
+            
 
-			return String.valueOf(participantNum);
+			return "YES "+String.valueOf(participantNum);
 		} catch(Exception e){
 				// End transaction boundary with failure
 				daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.ROLLBACK );
@@ -258,9 +268,10 @@ class ServerClientThread extends Thread {
 				// End transaction boundary with failure
 				daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.ROLLBACK );
 				e.printStackTrace();
+                return "NO";
 		}
 
-		return String.valueOf(accountNum);
+		return "YES "+String.valueOf(accountNum);
 	}
 
 
@@ -303,7 +314,7 @@ class ServerClientThread extends Thread {
 			
 			ArrayList<Market_Trend> mark_trend = sdao.get_market_trend("2020-08-01", "2024-12-01");
 			
-			String result = "";
+			String result = "YES ";
 			for (Market_Trend t : mark_trend) {
 				// System.out.println("Stock Name:" + t.get_stock_name());	
 				// System.out.println("Stock ID:" + t.get_stock_id());	
@@ -336,7 +347,7 @@ class ServerClientThread extends Thread {
 		// ParticipantDAO pdao = daoFactory.getParticipantDAO();
 			TransactionDAO sdao = daoFactory.getTransactionDAO();
 			ArrayList<Transaction_History> th = sdao.getTransactionHistory(account_id);
-			String result = "";
+			String result = "YES ";
 			if(th != null){
 				for(Transaction_History element : th) {
 					Transaction t = element.get_trans();
@@ -382,7 +393,7 @@ class ServerClientThread extends Thread {
 			StockDAO sdao = daoFactory.getStockDAO();
 			Stock_Analysis s1 = sdao.get_stock_analysis(stockId,date);
 				
-			String result = "";
+			String result = "YES ";
 			if(s1 != null){
 				Stock st = s1.get_stock();
 				result += "Stock Name: ";
