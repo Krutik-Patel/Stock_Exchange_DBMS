@@ -3,11 +3,11 @@ package DAO;
 import Table.*;
 
 public interface StocksOwnershipDAO {
-	public Stock getStocksOnwershipByKey(int stock_id, int owner_id);
+	public StocksOwnership getStocksOnwershipByKey(int stock_id, int owner_id)throws Exception;
 
 	public void addStocksOwnership(StocksOwnership stocksOwnership) throws Exception;
 
-	public void updateStock(StocksOwnership stocksOwnership) throws Exception;
+	public void updateStockOwnership(StocksOwnership stocksOwnership) throws Exception;
 
-	public void deleteStock(StocksOwnership stocksOwnership);
+	public void deleteStockOwnership(StocksOwnership stocksOwnership)throws Exception;
 }

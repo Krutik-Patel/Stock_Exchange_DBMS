@@ -29,6 +29,7 @@ public class DAO_Factory {
 	UserDAO userDAO = null;
 	TransactionDAO transactionDAO = null;
 	AccountsDAO accountsDAO = null;
+	StocksOwnershipDAO stocksOwnershipDAO = null;
 
 	boolean activeConnection = false;
 
@@ -121,7 +122,16 @@ public class DAO_Factory {
 		return accountsDAO;
 	}
 
+	public StocksOwnershipDAO getStocksOwnershipDAO() throws Exception {
+		if (activeConnection == false)
+			throw new Exception("Connection not activated...");
 
+		if (stocksOwnershipDAO == null)
+			stocksOwnershipDAO = new StocksOwnershipDAO_JDBC(dbconnection);
+
+		return stocksOwnershipDAO; 
+				
+	}
 
 	// END
 

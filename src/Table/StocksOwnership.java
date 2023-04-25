@@ -7,10 +7,10 @@ public class StocksOwnership {
     int units_owned;
 
     public StocksOwnership() {}
-    public StocksOwnership(int s,int o,int u) {
-        stck_id = s;
-        owner_id= o;
-        units_owned = u;
+    public StocksOwnership(int stck_id,int owner_id,int units_owned) {
+        this.stck_id = stck_id;
+        this.owner_id= owner_id;
+        this.units_owned = units_owned;
     }
 
     public int get_stck_id() { return stck_id; }
