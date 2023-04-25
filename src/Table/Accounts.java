@@ -5,11 +5,11 @@ public class Accounts {
 	String password;
 	String bank_acc_no;
 	public Accounts() { }
-	public Accounts (int a,int h, String p,String b){ 
-		account_id = a;
-        holder_regs_id=h; 
-		password = p; 
-        bank_acc_no = b;
+	public Accounts (int accountID,int holder_regs_id, String pass,String bank_acc){ 
+		this.account_id = accountID;
+        this.holder_regs_id=holder_regs_id; 
+		this.password = pass; 
+        this.bank_acc_no = bank_acc;
 		
 	 }
 

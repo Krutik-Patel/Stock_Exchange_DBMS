@@ -12,14 +12,14 @@ public class User {
     public User() {
     }
 
-    public User(int u, String f, String m, String l, Date d) {
-        user_id = u;
-        fname = f;
-        mname = m;
-        lname = l;
+    public User(int user_id, String fname, String mname, String lname, Date dob) {
+        this.user_id = user_id;
+        this.mname = mname;
+        this.fname = fname;
+        this.lname = lname;
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");  
-		String strDate= formatter.format(d); 
-		dob = strDate;
+		String strDate = formatter.format(dob); 
+		this.dob = strDate;
     }
 
     

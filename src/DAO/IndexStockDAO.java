@@ -6,4 +6,5 @@ public interface IndexStockDAO {
 	public void addIndexStock(IndexStock indexStock) throws Exception;
 	public void updateIndexStock(IndexStock indexStock) throws Exception;
 	public void deleteIndexStock(IndexStock indexStock);
+	public void recalculate();
 }
