@@ -14,17 +14,18 @@ public class Transaction {
     float trans_price;
 
     public Transaction() {}
-    public Transaction(int t,int af,int at,int s,int u,Date d,float p){
-        trans_id = t;
-        acc_id_from = af;
-        acc_id_to = at;
-        stk_id = s;
-        units =u;
+    public Transaction(int trans_id, int acc_id_from,int acc_id_to,int stk_id,int units,Date trans_date,float trans_price){
+        
+        this.trans_id = trans_id;
+        this.acc_id_from = acc_id_from;
+        this.acc_id_to = acc_id_to;
+        this.stk_id = stk_id;
+        this.units =units;
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");  
-		String strDate= formatter.format(d); 
-		trans_date = strDate;
+		String strDate= formatter.format(trans_date); 
+		this.trans_date = strDate;
 
-        trans_price = p;
+        this.trans_price = trans_price;
     }
 
     public int get_trans_id() { return trans_id;}
