@@ -4,9 +4,9 @@ public class Domain {
     String domain_name;
 
     public Domain() {}
-    public Domain(int d,String n){
-        domain_id = d;
-        domain_name = n;
+    public Domain(int dom_id,String dom_name){
+        domain_id = dom_id;
+        domain_name = dom_name;
     }
 
     public int get_Domain_id() { return domain_id;}

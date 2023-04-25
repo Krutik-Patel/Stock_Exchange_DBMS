@@ -7,10 +7,10 @@ public class NormalStock {
     boolean in_index;
 
     public NormalStock() {}
-    public NormalStock(int n,int s,boolean i) {
-        normal_stk_id = n;
-        stk_comp_id = s;
-        in_index = i;
+    public NormalStock(int norm_stk_id, int stck_comp_id, boolean in_ind) {
+        normal_stk_id = norm_stk_id;
+        stk_comp_id = stck_comp_id;
+        in_index = in_ind;
     }
 
     public int get_normal_stk_id() { return normal_stk_id; }

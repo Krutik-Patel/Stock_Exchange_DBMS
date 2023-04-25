@@ -9,12 +9,12 @@ public class Stock {
     int dom_id;
 
     public Stock() {}
-    public Stock(int s,String n,int u,float p,int d){
-        stock_id = s;
-        stock_name = n;
-        stock_units = u;
-        stock_price = p;
-        dom_id = d;
+    public Stock(int stk_id, String stk_name, int stk_units,float stk_price,int domain_id){
+        stock_id = stk_id;
+        stock_name = stk_name;
+        stock_units = stk_units;
+        stock_price = stk_price;
+        dom_id = domain_id;
     }
 
     public int get_stock_id(){ return stock_id;}

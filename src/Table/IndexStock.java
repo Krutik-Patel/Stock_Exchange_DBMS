@@ -6,9 +6,9 @@ public class IndexStock {
     int stock_quant;
 
     public IndexStock() {}
-    public IndexStock(int i,int s) {
-        index_stk_id = i;
-        stock_quant = s;
+    public IndexStock(int ind_stk_id,int stk_qty) {
+        index_stk_id = ind_stk_id;
+        stock_quant = stk_qty;
     }
 
     public int get_index_stk_id() { return index_stk_id; }

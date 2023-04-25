@@ -218,7 +218,7 @@ public class DAO_Demo {
 		//return "error";
 	}
 
-	public static String buyStock(int accountID, int stockId, int stockUnits) throws Exception{
+	public static String buyStock(int accountID,int  stockId,int stockUnits) throws Exception{
 		try {
 			daoFactory.activateConnection();
 			TransactionDAO tdao = daoFactory.getTransactionDAO();
@@ -226,6 +226,7 @@ public class DAO_Demo {
 			StocksOwnershipDAO sodao = daoFactory.getStocksOwnershipDAO();
 			
 			float stkprice = sdao.getStockByKey(stockId).get_stock_price();
+			long userToken = generateChronoToken();
 
 			int qtyBought = 0;
 			if (!sellerHash.containsKey(stockId)) {
@@ -239,7 +240,9 @@ public class DAO_Demo {
 					if ((stockUnits - qtyBought) < seller.getStockUnits()) {
 						int avail = seller.getStockUnits();
 						selLst.get(0).setStockUnits(avail - (stockUnits - qtyBought));
-					
+						
+						stkprice *= generatePriceMultiplier(seller.getChronoToken(), userToken);
+
 						Transaction newTrans = new Transaction(0, seller.getaccountID(), accountID, stockId, (stockUnits - qtyBought), new Date(), stkprice * (stockUnits - qtyBought));
 						tdao.addTransaction(newTrans);
 						StocksOwnership nwsoshp = new StocksOwnership(stockId, seller.getaccountID(), (avail - (stockUnits - qtyBought)));
@@ -251,41 +254,48 @@ public class DAO_Demo {
 					} else if ((stockUnits - qtyBought) >= seller.getStockUnits()) {
 						qtyBought += seller.getStockUnits();
 						int qt = Math.min(seller.getStockUnits(), (stockUnits - qtyBought));
+
+						stkprice *= generatePriceMultiplier(seller.getChronoToken(), userToken);
+
 						Transaction newTrans = new Transaction(0, seller.getaccountID(), accountID, stockId, qt, new Date(), stkprice * qt);
 						tdao.addTransaction(newTrans);
 						StocksOwnership nwsoshp = new StocksOwnership(stockId, seller.getaccountID(), 0);
 						sodao.deleteStockOwnership(nwsoshp);
 						selLst.remove(0);
 					}
-					StocksOwnership buyerSO = sodao.getStocksOnwershipByKey(stockId, accountID);
-					if (buyerSO != null) {
-						buyerSO.set_units_owned(buyerSO.get_units_owned() + qtyBought);
-						sodao.updateStockOwnership(buyerSO);
-					} else {
-						buyerSO = new StocksOwnership(stockId, accountID, qtyBought);
-						sodao.addStocksOwnership(buyerSO);
-					}
 				}
-			} else {
+				// price update
+				Stock nwStk = sdao.getStockByKey(stockId);
+				nwStk.set_stock_price(stkprice);
+				sdao.updateStock(nwStk);
+
+				// stocks ownership updates
+				StocksOwnership buyerSO = sodao.getStocksOnwershipByKey(stockId, accountID);
+				if (buyerSO != null) {
+					buyerSO.set_units_owned(buyerSO.get_units_owned() + qtyBought);
+					sodao.updateStockOwnership(buyerSO);
+				} else {
+					buyerSO = new StocksOwnership(stockId, accountID, qtyBought);
+					sodao.addStocksOwnership(buyerSO);
+				}
+			} if(sellerHash.get(stockId).isEmpty() && qtyBought < stockUnits) {
 				ArrayList<Thrie> buyLst = buyerHash.get(stockId);
-				int chronoToken = generateChronoToken();
-				Thrie newBuyer = new Thrie(stockId, accountID, chronoToken);
-				buyLst.add(stockUnits, newBuyer);
+				Thrie newBuyer = new Thrie(stockUnits - qtyBought, accountID, userToken);
+				buyLst.add(stockId, newBuyer);
 			}
-	
+
 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.COMMIT );
-	
+
 			return "Stocks bought: " + qtyBought + "\nStocks Remaining to buy" + (stockUnits - qtyBought) + "\n";
 			
 		} catch (Exception e) {
-				daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.ROLLBACK );
-				e.printStackTrace();
-				return "error";
+			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.ROLLBACK );
+			e.printStackTrace();
+			return "error";
 		}
-		
 	}
 
-	public static String sellStock(int accountID, int stockId, int stockUnits) throws Exception {
+	public static String sellStock(int accountID,int  stockId,int stockUnits) throws Exception{
 		try {
 			String initStr = "";
 			daoFactory.activateConnection();
@@ -294,6 +304,7 @@ public class DAO_Demo {
 			StocksOwnershipDAO sodao = daoFactory.getStocksOwnershipDAO();
 			
 			float stkprice = sdao.getStockByKey(stockId).get_stock_price();
+			long userToken = generateChronoToken();
 
 			StocksOwnership stkOnshp = sodao.getStocksOnwershipByKey(stockId, stockUnits);
 			if (stkOnshp == null) {
@@ -310,12 +321,15 @@ public class DAO_Demo {
 				buyerHash.put(stockId, newLst);
 			} if (!buyerHash.get(stockId).isEmpty()) {
 				ArrayList<Thrie> buyLst = buyerHash.get(stockId);
-				while (qtySold < stockUnits || !buyLst.isEmpty()) {
+				while (qtySold < stockUnits && !buyLst.isEmpty()) {
 					Thrie buyer = buyLst.get(0);
 					if ((stockUnits - qtySold) < buyer.getStockUnits()) {
 						int avail = buyer.getStockUnits();
 						buyer.setStockUnits(avail - (stockUnits - qtySold));
 					
+
+						stkprice *= generatePriceMultiplier(userToken, buyer.getChronoToken());
+
 						Transaction newTrans = new Transaction(0, accountID, buyer.getaccountID(), stockId, (stockUnits - qtySold), new Date(), stkprice * (stockUnits - qtySold));
 						tdao.addTransaction(newTrans);
 						StocksOwnership nwsoshp = new StocksOwnership(stockId, buyer.getaccountID(), (avail - (stockUnits - qtySold)));
@@ -327,6 +341,9 @@ public class DAO_Demo {
 					} else if ((stockUnits - qtySold) >= buyer.getStockUnits()) {
 						qtySold += buyer.getStockUnits();
 						int qt = Math.min(buyer.getStockUnits(), (stockUnits - qtySold));
+
+						stkprice *= generatePriceMultiplier(userToken, buyer.getChronoToken());
+
 						Transaction newTrans = new Transaction(0, accountID, buyer.getaccountID(), stockId, qt, new Date(), stkprice * qt);
 						tdao.addTransaction(newTrans);
 						StocksOwnership nwsoshp = new StocksOwnership(stockId, buyer.getaccountID(), 0);
@@ -334,32 +351,35 @@ public class DAO_Demo {
 						buyLst.remove(0);
 					}
 
-					StocksOwnership sellerSO = sodao.getStocksOnwershipByKey(stockId, accountID);
-					if (sellerSO.get_units_owned() > qtySold) {
-						sellerSO.set_units_owned(sellerSO.get_units_owned() - qtySold);
-						sodao.updateStockOwnership(sellerSO);
-					} else {
-						sodao.deleteStockOwnership(sellerSO);
-					}
 				}
-			} else {
-				ArrayList<Thrie> buyLst = buyerHash.get(stockId);
-				int chronoToken = generateChronoToken();
-				Thrie newBuyer = new Thrie(stockId, accountID, chronoToken);
-				buyLst.add(stockUnits, newBuyer);
+				// price update
+				Stock nwStk = sdao.getStockByKey(stockId);
+				nwStk.set_stock_price(stkprice);
+				sdao.updateStock(nwStk);
+				
+				// stock ownership updates
+				StocksOwnership sellerSO = sodao.getStocksOnwershipByKey(stockId, accountID);
+				if (sellerSO.get_units_owned() > qtySold) {
+					sellerSO.set_units_owned(sellerSO.get_units_owned() - qtySold);
+					sodao.updateStockOwnership(sellerSO);
+				} else {
+					sodao.deleteStockOwnership(sellerSO);
+				}
+			} if (qtySold < stockUnits && buyerHash.get(stockId).isEmpty()) {
+				ArrayList<Thrie> selLst = sellerHash.get(stockId);
+				Thrie newsel = new Thrie(stockUnits - qtySold, accountID, userToken);
+				selLst.add(stockId, newsel);
 			}
-	
+
 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.COMMIT );
-	
+
 			return initStr + "Stocks bought: " + qtySold + "\nStocks Remaining to buy" + (stockUnits - qtySold) + "\n";
 			
 		} catch (Exception e) {
-				daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.ROLLBACK );
-				e.printStackTrace();
-				return "error";
+			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.ROLLBACK );
+			e.printStackTrace();
+			return "error";
 		}
-		
-
 	}
 
 	public static String getMarketTrend(String par) throws Exception{
