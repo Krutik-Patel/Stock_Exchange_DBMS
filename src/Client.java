@@ -164,7 +164,7 @@ public class Client {
 
 				System.out.println(" -- Your Account ID: "+acc_id+" --");
         
-				clientMessage = ""acc_id+" "+password;
+				clientMessage = "1 "+acc_id+" "+password;
 
         //SERVER_COMMUNICATION
         outStream.writeUTF(clientMessage);

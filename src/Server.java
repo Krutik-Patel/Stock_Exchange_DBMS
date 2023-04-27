@@ -37,7 +37,7 @@ public class Server {
 
 class ServerClientThread extends Thread {
 	public static DAO_Factory daoFactory;
-	private static int revisePeriod = 20;
+	private static int revisePeriod = 2;
 	private static HashMap<Integer, ArrayList<Thrie>> buyerHash;
 	private static HashMap<Integer, ArrayList<Thrie>> sellerHash;	
 	private static RespObj resp;
@@ -452,7 +452,7 @@ class ServerClientThread extends Thread {
 			idao.recalculate();
 
 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.COMMIT );
-
+			System.out.println("Index Table recalculated...");
 			return true;
 		} catch (Exception e) {
 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.ROLLBACK );
