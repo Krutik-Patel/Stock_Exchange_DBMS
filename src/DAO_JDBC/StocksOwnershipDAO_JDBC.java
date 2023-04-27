@@ -66,13 +66,12 @@ public class StocksOwnershipDAO_JDBC implements StocksOwnershipDAO {
 
 			preparedStatement.setInt(1, stocksOwnership.get_stck_id());
 			preparedStatement.setInt(2, stocksOwnership.get_owner_id());
-			preparedStatement.setInt(2, stocksOwnership.get_units_owned());
+			preparedStatement.setInt(3, stocksOwnership.get_units_owned());
 
 			// execute insert SQL stetement
 			preparedStatement.executeUpdate();
 
-			System.out.println("StocksOwnership with ID " + stocksOwnership.get_stck_id()
-					+ ", added to the database");
+			System.out.println("Added StocksOwnership : stockID = " + stocksOwnership.get_stck_id() + "accountID = " + stocksOwnership.get_owner_id());
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}
@@ -104,8 +103,7 @@ public class StocksOwnershipDAO_JDBC implements StocksOwnershipDAO {
 
 			if (ret != 0) {
 
-				System.out.println("StocksOwnership with stock_id: " + stocksOwnership.get_stck_id()
-						+ ", updated successfully");
+				System.out.println("Updated StocksOwnership : stockID = " + stocksOwnership.get_stck_id() + "accountID = " + stocksOwnership.get_owner_id());
 			} else {
 				System.out.println("Update Failed for owner_id: " + stocksOwnership.get_owner_id());
 			}
@@ -138,8 +136,7 @@ public class StocksOwnershipDAO_JDBC implements StocksOwnershipDAO {
 			int ret = preparedStatement.executeUpdate();
 
 			if (ret != 0) {
-				System.out.println("StocksOwnership with id " + stocksOwnership.get_stck_id()
-						+ " deleted from the database");
+				System.out.println("Deleted StocksOwnership : stockID = " + stocksOwnership.get_stck_id() + "accountID = " + stocksOwnership.get_owner_id());
 			} else {
 				System.out.println("Delete Failed for id: " + stocksOwnership.get_stck_id());
 			}

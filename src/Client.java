@@ -13,7 +13,7 @@ public class Client {
 
 
 
-      	String login_acc_id = "$";
+      	String login_acc_id = "-";
 
         Scanner sc = new Scanner(System.in);
         boolean out = true;
@@ -21,7 +21,7 @@ public class Client {
 
 		
 
-		while(login_acc_id .equals("$")){
+		while(login_acc_id .equals("-")){
 
 			System.out.print("Already have an account (y / n): ");
 			String register = sc.next();
@@ -40,7 +40,7 @@ public class Client {
         serverMessage=inStream.readUTF();
 				//
             
-        String[] msg = serverMessage.split(" ");
+        String[] msg = serverMessage.split("[$]");
 
 				if( msg[0].equals("YES")){
 					login_acc_id = acc_id;
@@ -54,7 +54,7 @@ public class Client {
 			}
 			else{
 
-				String holder_regs_id = "$";
+				String holder_regs_id = "-";
 				System.out.print("Register User (u) / Company (c): ");
 				String part_choice = sc.next();
 				if(part_choice.equals("u")){
@@ -65,7 +65,7 @@ public class Client {
 					String mname = sc.next();
 					System.out.print("Last name : ");
 					String lname = sc.next();
-					System.out.print("Date of birth : ");
+					System.out.print("Date of birth(dd/MM/yyyy) : ");
 					String dob = sc.next();
 					System.out.print("Pan number : ");
 					String panNo = sc.next();
@@ -80,14 +80,14 @@ public class Client {
 				  //
 
 
-           String[] msg = serverMessage.split(" ");
+           String[] msg = serverMessage.split("[$]");
 
 				    if( msg[0].equals("YES")){
 				    	holder_regs_id = msg[1];
 				    	
 				    }
 				    else{
-				    	System.out.println(" -- KUCH TO ERROR AYA --");
+				    	System.out.println(" -- Something went wrong --");
 				    	continue;
 				    } 
 
@@ -113,14 +113,14 @@ public class Client {
 				  //
 
 
-           String[] msg = serverMessage.split(" ");
+           String[] msg = serverMessage.split("[$]");
 
 				    if( msg[0].equals("YES")){
 				    	holder_regs_id = msg[1];
 				    	
 				    }
 				    else{
-				    	System.out.println(" -- KUCH TO ERROR AYA --");
+				    	System.out.println(" -- Something went wrong --");
 				    	continue;
 				    } 
 
@@ -129,7 +129,7 @@ public class Client {
 
 				else continue;
 
-				if(holder_regs_id.equals("$")){
+				if(holder_regs_id.equals("-")){
 					continue;
 				}
 				
@@ -150,21 +150,21 @@ public class Client {
 				  //
 
 
-           String[] msg = serverMessage.split(" ");
+           String[] msg = serverMessage.split("[$]");
 
 				    if( msg[0].equals("YES")){
 				    	acc_id = msg[1];
 				    	
 				    }
 				    else{
-				    	System.out.println(" -- KUCH TO ERROR AYA --");
+				    	System.out.println(" -- Something went wrong --");
 				    	continue;
 				    } 
 
 
 				System.out.println(" -- Your Account ID: "+acc_id+" --");
         
-				clientMessage = acc_id+" "+password;
+				clientMessage = ""acc_id+" "+password;
 
         //SERVER_COMMUNICATION
         outStream.writeUTF(clientMessage);
@@ -172,7 +172,7 @@ public class Client {
         serverMessage=inStream.readUTF();
 				//
 
-        msg = serverMessage.split(" ");
+        msg = serverMessage.split("[$]");
 
 				if( msg[0].equals("YES")){
 					login_acc_id = acc_id;
@@ -190,80 +190,18 @@ public class Client {
 		}
 
     String[] msg;
+		System.out.println("1.Stock Analysis\n2.Buy Stocks\n3.Sell Stocks\n4. Market Trends\n5.Transaction History\n6. Index\n9. Exit");
 		System.out.print("Usecase Type : ");
 
 		int usecaseType = sc.nextInt();
 		switch(usecaseType){
+			
+
 			case 1 :
-			// 1 - Register User
-				System.out.print("First name : ");
-				String fname = sc.next();
-				System.out.print("Middle name : ");
-				String mname = sc.next();
-				System.out.print("Last name : ");
-				String lname = sc.next();
-				System.out.print("Date of birth : ");
-				String dob = sc.next();
-				System.out.print("Pan number : ");
-				String panNo = sc.next();
-
-
-		clientMessage = "3 "+fname+" "+mname+" "+lname+" "+dob+" "+panNo;
-
-         //SERVER_COMMUNICATION
-          outStream.writeUTF(clientMessage);
-          outStream.flush();
-          serverMessage=inStream.readUTF();
-				  //
-
-
-           msg = serverMessage.split(" ");
-
-				    if( msg[0].equals("YES")){
-				    	System.out.println(" -- Successfully Registered --");
-				    }
-				    else{
-				    	System.out.println(" -- KUCH TO ERROR AYA --");
-				    	
-				    } 
-
-				
-				break;
-				
-			case 2 :
-			// 2 - Register Company
-				System.out.print("Company name : ");
-				String companyName = sc.next();
-				System.out.print("Pan number : ");
-				String panNo2 = sc.next();
-				
-        clientMessage = "4 "+companyName+" "+panNo2;
-					
-
-
-           //SERVER_COMMUNICATION
-          outStream.writeUTF(clientMessage);
-          outStream.flush();
-          serverMessage=inStream.readUTF();
-				  //
-
-
-           msg = serverMessage.split(" ");
-
-				    if( msg[0].equals("YES")){
-				    	System.out.println(" -- Successfully Registered --");
-				    }
-				    else{
-				    	System.out.println(" -- KUCH TO ERROR AYA --");
-				    	
-				    } 
-
-				break;
-
-			case 3 :
 			// 3 - Analysis of particular stock
 				System.out.print("Stock ID : ");
 				String stockId3 = sc.next();
+				System.out.print("Date(yyyy-mm-dd): ");
 				String date = sc.next();
 
         clientMessage = "5 "+stockId3+" "+date;
@@ -276,7 +214,7 @@ public class Client {
 				  //
 
 
-           msg = serverMessage.split(" ");
+           msg = serverMessage.split("[$]");
 
 				    if( msg[0].equals("YES")){
               for(int i=1;i<msg.length;i++){
@@ -285,20 +223,20 @@ public class Client {
 				    	
 				    }
 				    else{
-				    	System.out.println(" -- KUCH TO ERROR AYA --");
+				    	System.out.println(" -- Something went wrong --");
 				    	
 				    } 
 				
 				break;
 
-			case 4 :
+			case 2 :
 			// 4 - Buy stocks
 				System.out.print("Stock ID : ");
 				String stockId4 = sc.next();
 				System.out.print("No. of stock units to buy : ");
 				String stockUnits4 = sc.next();
 
-         clientMessage = "6 "+stockId4+" "+stockUnits4;
+         clientMessage = "6 "+login_acc_id+" "+stockId4+" "+stockUnits4;
 				
 
            //SERVER_COMMUNICATION
@@ -308,7 +246,7 @@ public class Client {
 				  //
 
 
-           msg = serverMessage.split(" ");
+           msg = serverMessage.split("[$]");
 
 				    if( msg[0].equals("YES")){
               for(int i=1;i<msg.length;i++){
@@ -317,21 +255,21 @@ public class Client {
 				    	
 				    }
 				    else{
-				    	System.out.println(" -- KUCH TO ERROR AYA --");
+				    	System.out.println(" -- Something went wrong --");
 				    	
 				    } 
 
 				
 				break;
 
-			case 5 :
+			case 3 :
 			// 5 - Sell stocks
 				System.out.print("Stock ID : ");
 				String stockId5 = sc.next();
 				System.out.print("No. of stock units to sell : ");
 				String stockUnits5 = sc.next();
 				
-         clientMessage = "7 "+stockId5+" "+stockUnits5;
+         clientMessage = "7 "+login_acc_id+" "+stockId5+" "+stockUnits5;
 				
 
            //SERVER_COMMUNICATION
@@ -341,7 +279,7 @@ public class Client {
 				  //
 
 
-           msg = serverMessage.split(" ");
+           msg = serverMessage.split("[$]");
 
 				    if( msg[0].equals("YES")){
               for(int i=1;i<msg.length;i++){
@@ -350,16 +288,16 @@ public class Client {
 				    	
 				    }
 				    else{
-				    	System.out.println(" -- KUCH TO ERROR AYA --");
+				    	System.out.println(" -- Something went wrong --");
 				    	
 				    } 
 
 				break;
 
-			case 6 :
+			case 4 :
 			// 6 - Market trends
 
-        System.out.print("Parameter for Market trend(M/D/Y) : ");
+        System.out.print("Parameter for Market trend(M(Month)/D(Day)/Y(Year)/W(Week)) : ");
 				String parTrend = sc.next();
 
          clientMessage = "8 "+parTrend;
@@ -372,7 +310,7 @@ public class Client {
 				  //
 
 
-           msg = serverMessage.split(" ");
+           msg = serverMessage.split("[$]");
 
 				    if( msg[0].equals("YES")){
               for(int i=1;i<msg.length;i++){
@@ -381,13 +319,13 @@ public class Client {
 				    	
 				    }
 				    else{
-				    	System.out.println(" -- KUCH TO ERROR AYA --");
+				    	System.out.println(" -- Something went wrong --");
 				    	
 				    } 
 				
 				break;
 
-			case 7 :
+			case 5 :
 			// 7 - User transaction history
 				
          clientMessage = "9 "+login_acc_id;
@@ -399,7 +337,7 @@ public class Client {
           serverMessage=inStream.readUTF();
 				  //
 
-           msg = serverMessage.split(" ");
+           msg = serverMessage.split("[$]");
 
 				    if( msg[0].equals("YES")){
               for(int i=1;i<msg.length;i++){
@@ -408,17 +346,44 @@ public class Client {
 				    	
 				    }
 				    else{
-				    	System.out.println(" -- KUCH TO ERROR AYA --");
+				    	System.out.println(" -- Something went wrong --");
 				    	
 				    } 
 				
 				break;
 
-			//case 8 
+			case 6: 
 			// 8 - Index of domain wise stocks
+				clientMessage = "10";
+				
 
-      case 9 :
+           //SERVER_COMMUNICATION
+          outStream.writeUTF(clientMessage);
+          outStream.flush();
+          serverMessage=inStream.readUTF();
+				  //
+
+           msg = serverMessage.split("[$]");
+
+
+					
+				    if( msg[0].equals("YES")){
+              for(int i=1;i<msg.length;i++){
+                  System.out.println(msg[i]);
+              }
+				    	
+				    }
+				    else{
+				    	System.out.println(" -- Something went wrong --");
+				    	
+				    } 
+
+			break;
+
+      case 7 :
           out = false;
+
+		  break;
 
 			default :
 				System.out.print("Wrong usecase type! \n");

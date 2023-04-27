@@ -30,7 +30,7 @@ public class Transaction {
 
     public int get_trans_id() { return trans_id;}
     public int get_acc_id_from() { return acc_id_from;}
-    public int get_acc_id_to() { return acc_id_from;}
+    public int get_acc_id_to() { return acc_id_to;}
     public int get_stk_id() { return stk_id;}
     public int get_units() { return units;}
     public String get_trans_date() { return trans_date;}
@@ -39,7 +39,7 @@ public class Transaction {
 
     public void set_trans_id(int t) {  trans_id=t;}
     public void set_acc_id_from(int af) {  acc_id_from=af;}
-    public void set_acc_id_to(int at) {  acc_id_from=at;}
+    public void set_acc_id_to(int at) {  acc_id_to=at;}
     public void set_stk_id(int s) {  stk_id=s;}
     public void set_units(int u) {  units=u;}
     public void set_trans_date(Date d) {  
