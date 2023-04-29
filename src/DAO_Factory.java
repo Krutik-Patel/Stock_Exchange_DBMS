@@ -166,6 +166,8 @@ public class DAO_Factory {
 				companyDAO = null;
 				transactionDAO = null;
 				accountsDAO = null;
+				stocksOwnershipDAO = null;
+				indexStockDAO=null;
 			} catch (SQLException ex) {
 				// handle any errors
 				System.out.println("SQLException: " + ex.getMessage());

@@ -13,5 +13,10 @@ class Thrie {
     public void setStockUnits(int stockUnits) { this.stockUnits = stockUnits; }
     public void setaccountID(int accountID) { this.accountID = accountID; }
     public void setChronoToken(long chronoToken) { this.chronoToken = chronoToken; }
+}
 
+class RespObj {
+    private int responses = 0;
+    public int getResponses() { return responses; }
+    public void setResponses(int responses) { this.responses = responses;}
 }

@@ -5,9 +5,13 @@ import Join_Table.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.net.*;
-import java.util.ArrayList;
 import java.io.*;
+
 public class Server {
+	private static HashMap<Integer, ArrayList<Thrie>> buyerHash = new HashMap<>();
+	private static HashMap<Integer, ArrayList<Thrie>> sellerHash = new HashMap<>();
+	private static RespObj respObj = new RespObj();	
+	
 
 	public static void main(String[] args) throws Exception {
 		
@@ -21,7 +25,7 @@ public class Server {
 				counter++;
 				Socket serverClient=server.accept();  //server accept the client connection request
 				System.out.println(" >> " + "Client No:" + counter + " started!");
-				ServerClientThread sct = new ServerClientThread(serverClient,counter); //send  the request to a separate thread
+				ServerClientThread sct = new ServerClientThread(serverClient,counter, buyerHash, sellerHash, respObj); //send  the request to a separate thread
 				sct.start();
 			}
 		
@@ -33,17 +37,20 @@ public class Server {
 
 class ServerClientThread extends Thread {
 	public static DAO_Factory daoFactory;
-	private static HashMap<Integer, ArrayList<Thrie>> buyerHash = new HashMap<>();
-	private static HashMap<Integer, ArrayList<Thrie>> sellerHash = new HashMap<>();	
-	private static int responses = 0;
-	private static int revisePeriod = 20;
+	private static int revisePeriod = 2;
+	private static HashMap<Integer, ArrayList<Thrie>> buyerHash;
+	private static HashMap<Integer, ArrayList<Thrie>> sellerHash;	
+	private static RespObj resp;
 	Socket serverClient;
 	int clientNo;
 	int squre;
 
-	ServerClientThread(Socket inSocket, int counter) {
+	ServerClientThread(Socket inSocket, int counter, HashMap<Integer, ArrayList<Thrie>> buyerHash, HashMap<Integer, ArrayList<Thrie>> sellerHash, RespObj resp) {
 		serverClient = inSocket;
 		clientNo=counter;
+		this.buyerHash = buyerHash;
+		this.sellerHash = sellerHash;
+		this.resp = resp;
 	}
 
 
@@ -59,12 +66,12 @@ class ServerClientThread extends Thread {
 				/* CLIENT COMMUNICATION */
 				clientMessage=inStream.readUTF();
 
-				System.out.println("CLIENT --------------------------------");
+				System.out.println("CLIENT ----------------------------------");
 				System.out.println(clientMessage);
 				// SERVER MESSAGE
 				serverMessage = parseResponse(clientMessage);
 
-				System.out.println("SERVER ---------------------------------");
+				System.out.println("SERVER ----------------------------------");
 				System.out.println(serverMessage);
 
 				outStream.writeUTF(serverMessage);
@@ -77,19 +84,20 @@ class ServerClientThread extends Thread {
 		} catch(Exception ex) {
 			System.out.println(ex);
 		} finally {
-			System.out.println("Client -" + clientNo + " exit!! ");
+			System.out.println("Client $" + clientNo + " exit!! ");
 		}
 	}
 
 		// Util Functions
-
+	private static void respCheck() {
+		resp.setResponses(resp.getResponses() + 1); // after revisePeriod number of responses, the indexStock calculates again
+		if (resp.getResponses() % revisePeriod == 0) {
+			reviseIndex();
+			resp.setResponses(0);
+		}
+	}
 
 	public static String parseResponse(String cliRes) throws Exception {
-		responses++; // after revisePeriod number of responses, the indexStock calculates again
-		if (responses % revisePeriod == 0) {
-			reviseIndex();
-			responses = 0;
-		}
 		try {
 			String[] resp = cliRes.split(" ");
 				
@@ -128,12 +136,14 @@ class ServerClientThread extends Thread {
 				return analyzeStock(stockId,date);
 			}
 			else if(resp[0].equals("6")){
+				respCheck();
 				int accountId = Integer.parseInt(resp[1]);
 				int stockId = Integer.parseInt(resp[2]);
 				int stockUnits = Integer.parseInt(resp[3]);
 				return buyStock(accountId, stockId, stockUnits);
 			}
 			else if(resp[0].equals("7")){
+				respCheck();
 				int accountId = Integer.parseInt(resp[1]);
 				int stockId = Integer.parseInt(resp[2]);
 				int stockUnits = Integer.parseInt(resp[3]);
@@ -148,13 +158,13 @@ class ServerClientThread extends Thread {
 				return getTransactionHistory(accountId);
 			}
 			else if(resp[0].equals("10")){
-				return "Nothing";
+				return indexStockInfo();
 			}
 		}
 		catch(Exception e) {
 			return "error";
 		}
-		return "No-result";
+		return "No$result";
 	}
 
 
@@ -173,7 +183,10 @@ class ServerClientThread extends Thread {
 	}
 
 	private static float generatePriceMultiplier(long lessTkn, long moreTkn) {
-		return 1;
+		long avg_tkn = lessTkn + (moreTkn - lessTkn) / 2;
+		double ration = Math.atan((lessTkn - moreTkn) / Math.sqrt(Math.sqrt(avg_tkn)));
+		float ratio = (float) (1 + ration);
+		return ratio;
 	}
 
 	private static int generateParticipantID() {
@@ -204,7 +217,7 @@ class ServerClientThread extends Thread {
 		//end main
 	public static String registerUser(String fname, String mname, String lname, String dob, String panNo) throws Exception {
 		Date currDate = new Date();
-		SimpleDateFormat sdf = new SimpleDateFormat("dd-mm-yyyy");
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/mm/yyyy");
 		Date dateOfBirth = sdf.parse(dob);
 		int participantNum = generateParticipantID();
 		Participants newParticipant = new Participants(participantNum, panNo, currDate);
@@ -222,7 +235,7 @@ class ServerClientThread extends Thread {
 			// End transaction boundary with success
 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.COMMIT );
 
-			return "YES "+String.valueOf(participantNum);
+			return "YES$"+String.valueOf(participantNum);
 		} catch(Exception e){
 				// End transaction boundary with failure
 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.ROLLBACK );
@@ -252,7 +265,7 @@ class ServerClientThread extends Thread {
 			// End transaction boundary with success
 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.COMMIT );
 
-			return "YES "+String.valueOf(participantNum);
+			return "YES$"+String.valueOf(participantNum);
 		} catch(Exception e){
 				// End transaction boundary with failure
 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.ROLLBACK );
@@ -287,7 +300,7 @@ class ServerClientThread extends Thread {
 			return "NO";
 		}
 
-		return "YES "+String.valueOf(accountNum);
+		return "YES$"+String.valueOf(accountNum);
 	}
 
 
@@ -346,21 +359,25 @@ class ServerClientThread extends Thread {
 			String stDate = sdf.format(stD);
 			ArrayList<Market_Trend> mark_trend = sdao.get_market_trend(stDate, endDate);
 			
-			String result = "YES ";
+			String result = "YES$";
 			for (Market_Trend t : mark_trend) {
 				// System.out.println("Stock Name:" + t.get_stock_name());	
 				// System.out.println("Stock ID:" + t.get_stock_id());	
 				// System.out.println("Prev price:" + t.get_prev_price());	
 				// System.out.println("Curr price:" + t.get_curr_price());	
 
+				result += "STOCK: ";
 				result += t.get_stock_name();
-				result += " ";
+				result += "\nSTOCK ID: ";
 				result += String.valueOf(t.get_stock_id());
-				result += " ";
+				result += "\nSTOCK PREV PRICE: ";
 				result += String.valueOf(t.get_prev_price());
-				result += " ";
+				result += "\nSTOCK CURRENT PRICE: ";
 				result += String.valueOf(t.get_curr_price());
-				result += " ";
+				result +="\nPercent Change in STOCK PRICE: ";
+				result += (((t.get_curr_price()-t.get_prev_price())/t.get_prev_price())*100);
+				result += "%";
+				result += "$++++++++++++++++++++++++++++++++++++++++$";
 			}
 			
 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.COMMIT );
@@ -379,28 +396,38 @@ class ServerClientThread extends Thread {
 		// ParticipantDAO pdao = daoFactory.getParticipantDAO();
 			TransactionDAO sdao = daoFactory.getTransactionDAO();
 			ArrayList<Transaction_History> th = sdao.getTransactionHistory(account_id);
-			String result = "YES ";
+			String result = "YES$";
 			if(th != null){
 				for(Transaction_History element : th) {
 					Transaction t = element.get_trans();
 
+					result += "Trans ID: ";
 					result += String.valueOf(t.get_trans_id());
-					result += " ";
+					result += "$";
+					result += "Trans Date: ";
 					result += t.get_trans_date();
-					result += " ";
+					result += "$";
+					result += "Trans Units: ";
 					result += String.valueOf(t.get_units());
-					result += " ";
+					result += "$";
+					result += "Trans Price: ";
 					result += String.valueOf(t.get_trans_price());
-					result += " ";
+					result += "$";
+					result += "Trans FROM: ";
 					result += element.get_from_name();
-					result += " ";
+					result += "$";
+					result += "Trans TO: ";
 					result += element.get_to_name();
-					result += " ";
+					result += "$";
+					result += "Trans STOCK: ";
 					result += element.get_stock_name();
-					result += " ";
+					result +="$++++++++++++++++++++++++++++++++++++++++++++$";
 					
 				}
 			
+			}
+			else{
+				result += "No record found";
 			}
 
 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.COMMIT );
@@ -414,9 +441,7 @@ class ServerClientThread extends Thread {
 
 	}
 
-	public static String indexStockInfo() throws Exception{
-		return "";
-	}
+	
 
 
 	public static boolean reviseIndex() {
@@ -427,7 +452,7 @@ class ServerClientThread extends Thread {
 			idao.recalculate();
 
 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.COMMIT );
-
+			System.out.println("Index Table recalculated...");
 			return true;
 		} catch (Exception e) {
 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.ROLLBACK );
@@ -442,32 +467,37 @@ class ServerClientThread extends Thread {
 			StockDAO sdao = daoFactory.getStockDAO();
 			Stock_Analysis s1 = sdao.get_stock_analysis(stockId,date);
 				
-			String result = "YES ";
+			String result = "YES$";
 			if(s1 != null){
 				Stock st = s1.get_stock();
 				result += "Stock Name: ";
 				result += st.get_stock_name();
-				result += " ";
+				result += "$";
 				result += "Stock Units: ";
 				result += String.valueOf(st.get_stock_units());
-				result += " ";
+				result += "$";
 				result += "Stock Price: ";
 				result += String.valueOf(st.get_stock_price());
-				result += " ";
+				result += "$";
 				result += "Stock Domain ID: ";
 				result += String.valueOf(st.get_dom_id());
-				result += " ";
+				result += "$";
 				result += "Transacted money from ";
 				result += date;
-				result += ": ";
+				result += ":  ";
 				result += String.valueOf(s1.get_total_trans_price());
-				result += " ";
-				result += "Transacted units in past month: ";
+				result += "$";
+				result += "Transacted units : ";
 				result += String.valueOf(s1.get_total_units());
-				result += " ";
-				result += "Total number of transactions in past month: ";
+				result += "$";
+				result += "Total number of transactions from";
+				result += date;
+				result += ": ";
 				result += String.valueOf(s1.get_total_transaction());
-				result += " ";
+				result += "$";
+			}
+			else{
+				result+= "No record found";
 			}
 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.COMMIT );
 			return result;
@@ -520,8 +550,10 @@ class ServerClientThread extends Thread {
 						break;
 					} else if ((stockUnits - qtyBought) >= seller.getStockUnits()) {
 						qtyBought += seller.getStockUnits();
-						int qt = Math.min(seller.getStockUnits(), (stockUnits - qtyBought));
-
+						int qt = seller.getStockUnits();
+						System.out.println("StockUnits :" + qt);
+						System.out.println("AccountID :" + seller.getaccountID());
+						System.out.println("BuyerAccountID :" + accountID);
 						stkprice *= generatePriceMultiplier(seller.getChronoToken(), userToken);
 
 						Transaction newTrans = new Transaction(0, seller.getaccountID(), accountID, stockId, qt, new Date(), stkprice * qt);
@@ -547,13 +579,21 @@ class ServerClientThread extends Thread {
 				}
 			} if(sellerHash.get(stockId).isEmpty() && qtyBought < stockUnits) {
 				ArrayList<Thrie> buyLst = buyerHash.get(stockId);
+				if (buyLst == null) {
+					buyLst = new ArrayList<>();
+				}
 				Thrie newBuyer = new Thrie(stockUnits - qtyBought, accountID, userToken);
-				buyLst.add(stockId, newBuyer);
+				buyLst.add(newBuyer);
+				buyerHash.put(stockId, buyLst);
+				System.out.println("buyer added to waiting list...");
 			}
 
 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.COMMIT );
-
-			return "Stocks bought: " + qtyBought + "\nStocks Remaining to buy" + (stockUnits - qtyBought) + "\n";
+			if (qtyBought > 0) {
+				return "YES$"+"Stocks bought: " + qtyBought + "\nStocks Remaining to buy :" + (stockUnits - qtyBought) + "\n";
+			} else {
+				return "YES$Stock not available currently, your transaction will happen automatically when a seller is available.";
+			}
 			
 		} catch (Exception e) {
 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.ROLLBACK );
@@ -573,12 +613,12 @@ class ServerClientThread extends Thread {
 			float stkprice = sdao.getStockByKey(stockId).get_stock_price();
 			long userToken = generateChronoToken();
 
-			StocksOwnership stkOnshp = sodao.getStocksOnwershipByKey(stockId, stockUnits);
+			StocksOwnership stkOnshp = sodao.getStocksOnwershipByKey(stockId, accountID);
 			if (stkOnshp == null) {
-				return "You don't own any such stock.";
+				return "YES$You don't own any such stock.";
 			} else if (stkOnshp.get_units_owned() < stockUnits) {
 				stockUnits = stkOnshp.get_units_owned();
-				initStr = "You own lesser that asked. Only can sell " + stockUnits + "units of stocks.\n";
+				initStr = "You own lesser than asked. Only can sell " + stockUnits + "units of stocks.\n";
 			}
 
 
@@ -599,22 +639,29 @@ class ServerClientThread extends Thread {
 
 						Transaction newTrans = new Transaction(0, accountID, buyer.getaccountID(), stockId, (stockUnits - qtySold), new Date(), stkprice * (stockUnits - qtySold));
 						tdao.addTransaction(newTrans);
-						StocksOwnership nwsoshp = new StocksOwnership(stockId, buyer.getaccountID(), (avail - (stockUnits - qtySold)));
-						sodao.updateStockOwnership(nwsoshp);
+						StocksOwnership nwsoshp = sodao.getStocksOnwershipByKey(stockId, accountID);
+						if (nwsoshp != null) {
+							nwsoshp = new StocksOwnership(stockId, buyer.getaccountID(), (avail - (stockUnits - qtySold)));
+							sodao.updateStockOwnership(nwsoshp);
+						} else {
+							nwsoshp = new StocksOwnership(stockId, buyer.getaccountID(), (avail - (stockUnits - qtySold)));
+							sodao.addStocksOwnership(nwsoshp);
+						}
+						
 						
 						qtySold = stockUnits;
 						
 						break;
 					} else if ((stockUnits - qtySold) >= buyer.getStockUnits()) {
 						qtySold += buyer.getStockUnits();
-						int qt = Math.min(buyer.getStockUnits(), (stockUnits - qtySold));
+						int qt = buyer.getStockUnits();
 
 						stkprice *= generatePriceMultiplier(userToken, buyer.getChronoToken());
 
 						Transaction newTrans = new Transaction(0, accountID, buyer.getaccountID(), stockId, qt, new Date(), stkprice * qt);
 						tdao.addTransaction(newTrans);
-						StocksOwnership nwsoshp = new StocksOwnership(stockId, buyer.getaccountID(), 0);
-						sodao.deleteStockOwnership(nwsoshp);
+						StocksOwnership nwsoshp = new StocksOwnership(stockId, buyer.getaccountID(), qt);
+						sodao.addStocksOwnership(nwsoshp);
 						buyLst.remove(0);
 					}
 
@@ -634,13 +681,22 @@ class ServerClientThread extends Thread {
 				}
 			} if (qtySold < stockUnits && buyerHash.get(stockId).isEmpty()) {
 				ArrayList<Thrie> selLst = sellerHash.get(stockId);
+				if (selLst == null) {
+					selLst = new ArrayList<>();
+				}
 				Thrie newsel = new Thrie(stockUnits - qtySold, accountID, userToken);
-				selLst.add(stockId, newsel);
+				selLst.add(newsel);
+				sellerHash.put(stockId, selLst);
+				System.out.println("seller added to waiting list...");
 			}
 
 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.COMMIT );
 
-			return initStr + "Stocks bought: " + qtySold + "\nStocks Remaining to buy" + (stockUnits - qtySold) + "\n";
+			if (qtySold > 0) {
+				return "YES$"+initStr + "Stocks bought: " + qtySold + "\nStocks Remaining to buy: " + (stockUnits - qtySold) + "\n";
+			} else {
+				return "YES$" + initStr + "No buyer available currently, your transaction will occur automatically when a buyer for the stock is available.";
+			}
 			
 		} catch (Exception e) {
 			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.ROLLBACK );
@@ -648,4 +704,51 @@ class ServerClientThread extends Thread {
 			return "error";
 		}
 	}
+
+// indexStockInfo
+	public static String indexStockInfo() throws Exception{
+		try{
+			daoFactory.activateConnection();
+			IndexStockDAO sdao = daoFactory.getIndexStockDAO();
+			ArrayList<Index_Info> stkinfo = sdao.getIndexStockInfo();
+			String result = "YES$";
+			if(stkinfo != null){
+				for(Index_Info ind : stkinfo) {
+					
+					result += "Index Stock ID: ";
+					result += String.valueOf(ind.get_index_stk_id());
+					result += "$Index Name: ";
+					result += ind.get_stock_name();
+					result += "$Index Stock Units: ";
+					result += String.valueOf(ind.get_stock_units());
+					result += "$Index Price: ";
+					result += String.valueOf(ind.get_stock_price());
+					result += "$Index Domain ID: ";
+					result += String.valueOf(ind.get_dom_id());
+					result += "$Index Domain Name";
+					result += ind.get_domain_name();
+					result += "$Index Quantity: ";
+					result += String.valueOf(ind.get_stock_quant());
+					result += " ";
+					result +="$++++++++++++++++++++++++++++++++++$";
+					
+				}
+			
+			}
+			else{
+				
+			}
+
+			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.COMMIT );
+			return result;
+
+		}catch(Exception e){
+			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.ROLLBACK );
+			e.printStackTrace();
+			return "error";
+		}
+	}
+
+
+
 }

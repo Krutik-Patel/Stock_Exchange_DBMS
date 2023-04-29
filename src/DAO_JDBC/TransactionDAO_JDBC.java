@@ -78,7 +78,7 @@ public class TransactionDAO_JDBC implements TransactionDAO {
 	public void addTransaction(Transaction Transaction) throws Exception {
 		PreparedStatement preparedStatement = null;
 		String sql;
-		sql = "insert into Transaction(trans_id,acc_id_from,acc_id_to,stk_id,units,trans_date,trans_price) values (?,?,?,?,?,?,?)";
+		sql = "insert into Transaction(acc_id_from,acc_id_to,stk_id,units,trans_date,trans_price) values (?,?,?,?,?,?)";
 
 		String d = Transaction.get_trans_date();
 		Date date = new SimpleDateFormat("dd/MM/yyyy").parse(d);
@@ -86,19 +86,18 @@ public class TransactionDAO_JDBC implements TransactionDAO {
 		try {
 			preparedStatement = dbConnection.prepareStatement(sql);
 
-			preparedStatement.setInt(1, Transaction.get_trans_id());
-            preparedStatement.setInt(2, Transaction.get_acc_id_from());
-            preparedStatement.setInt(3, Transaction.get_acc_id_to());
-            preparedStatement.setInt(4, Transaction.get_stk_id());
-            preparedStatement.setInt(5, Transaction.get_units());
-			preparedStatement.setDate(6, new java.sql.Date(date.getTime()));
-			preparedStatement.setFloat(7, Transaction.get_trans_price());
+			// preparedStatement.setInt(1, Transaction.get_trans_id());
+            preparedStatement.setInt(1, Transaction.get_acc_id_from());
+            preparedStatement.setInt(2, Transaction.get_acc_id_to());
+            preparedStatement.setInt(3, Transaction.get_stk_id());
+            preparedStatement.setInt(4, Transaction.get_units());
+			preparedStatement.setDate(5, new java.sql.Date(date.getTime()));
+			preparedStatement.setFloat(6, Transaction.get_trans_price());
 
 			// execute insert SQL stetement
 			preparedStatement.executeUpdate();
 
-			System.out.println("Transaction with ID " + Transaction.get_trans_id()
-					+ ", added to the database");
+			System.out.println("Transaction from acc_id: " + Transaction.get_acc_id_from() + " -> " + Transaction.get_acc_id_to() + " successful.");
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}

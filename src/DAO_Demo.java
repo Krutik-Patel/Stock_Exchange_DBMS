@@ -461,7 +461,41 @@ public class DAO_Demo {
 	}
 
 	public static String indexStockInfo() throws Exception{
-		return "";
+		try{
+			daoFactory.activateConnection();
+			IndexStockDAO sdao = daoFactory.getIndexStockDAO();
+			ArrayList<Index_Info> stkinfo = sdao.getIndexStockInfo();
+			String result = "";
+			if(stkinfo != null){
+				for(Index_Info ind : stkinfo) {
+
+					result += String.valueOf(ind.get_index_stk_id());
+					result += " ";
+					result += ind.get_stock_name();
+					result += " ";
+					result += String.valueOf(ind.get_stock_units());
+					result += " ";
+					result += String.valueOf(ind.get_stock_price());
+					result += " ";
+					result += String.valueOf(ind.get_dom_id());
+					result += " ";
+					result += ind.get_domain_name();
+					result += " ";
+					result += String.valueOf(ind.get_stock_quant());
+					result += " ";
+					
+				}
+			
+			}
+
+			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.COMMIT );
+			return result;
+
+		}catch(Exception e){
+			daoFactory.deactivateConnection( DAO_Factory.TXN_STATUS.ROLLBACK );
+			e.printStackTrace();
+			return "error";
+		}
 	}
 	
 	public static String parseResponse(String cliRes) throws Exception{

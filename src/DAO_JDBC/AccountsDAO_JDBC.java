@@ -148,7 +148,7 @@ public class AccountsDAO_JDBC implements  AccountsDAO {
 		// Deletion
 		PreparedStatement preparedStatement = null;
 		String sql;
-		sql = "DELETE FROM Accounts where account_id = ?;";
+		sql = "DELETE FROM Accounts where account_id = ?";
 		try {
 			preparedStatement = dbConnection.prepareStatement(sql);
 
