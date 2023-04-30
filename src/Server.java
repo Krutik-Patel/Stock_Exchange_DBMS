@@ -84,7 +84,7 @@ class ServerClientThread extends Thread {
 		} catch(Exception ex) {
 			System.out.println(ex);
 		} finally {
-			System.out.println("Client $" + clientNo + " exit!! ");
+			System.out.println("Client " + clientNo + " exit!! ");
 		}
 	}
 
@@ -164,7 +164,7 @@ class ServerClientThread extends Thread {
 		catch(Exception e) {
 			return "error";
 		}
-		return "No$result";
+		return "No result";
 	}
 
 
@@ -359,7 +359,7 @@ class ServerClientThread extends Thread {
 			String stDate = sdf.format(stD);
 			ArrayList<Market_Trend> mark_trend = sdao.get_market_trend(stDate, endDate);
 			
-			String result = "YES$";
+			String result = "YES$++++++++++++++++++++++++++++++++++++++++$";
 			for (Market_Trend t : mark_trend) {
 				// System.out.println("Stock Name:" + t.get_stock_name());	
 				// System.out.println("Stock ID:" + t.get_stock_id());	
@@ -396,7 +396,7 @@ class ServerClientThread extends Thread {
 		// ParticipantDAO pdao = daoFactory.getParticipantDAO();
 			TransactionDAO sdao = daoFactory.getTransactionDAO();
 			ArrayList<Transaction_History> th = sdao.getTransactionHistory(account_id);
-			String result = "YES$";
+			String result = "YES$++++++++++++++++++++++++++++++++++++++++$";
 			if(th != null){
 				for(Transaction_History element : th) {
 					Transaction t = element.get_trans();
@@ -421,7 +421,7 @@ class ServerClientThread extends Thread {
 					result += "$";
 					result += "Trans STOCK: ";
 					result += element.get_stock_name();
-					result +="$++++++++++++++++++++++++++++++++++++++++++++$";
+					result +="$++++++++++++++++++++++++++++++++++++++++$";
 					
 				}
 			
@@ -467,7 +467,7 @@ class ServerClientThread extends Thread {
 			StockDAO sdao = daoFactory.getStockDAO();
 			Stock_Analysis s1 = sdao.get_stock_analysis(stockId,date);
 				
-			String result = "YES$";
+			String result = "YES$++++++++++++++++++++++++++++++++++++++++$";
 			if(s1 != null){
 				Stock st = s1.get_stock();
 				result += "Stock Name: ";
@@ -490,11 +490,11 @@ class ServerClientThread extends Thread {
 				result += "Transacted units : ";
 				result += String.valueOf(s1.get_total_units());
 				result += "$";
-				result += "Total number of transactions from";
+				result += "Total number of transactions from ";
 				result += date;
 				result += ": ";
 				result += String.valueOf(s1.get_total_transaction());
-				result += "$";
+				result += "$++++++++++++++++++++++++++++++++++++++++$";
 			}
 			else{
 				result+= "No record found";
@@ -711,7 +711,7 @@ class ServerClientThread extends Thread {
 			daoFactory.activateConnection();
 			IndexStockDAO sdao = daoFactory.getIndexStockDAO();
 			ArrayList<Index_Info> stkinfo = sdao.getIndexStockInfo();
-			String result = "YES$";
+			String result = "YES$++++++++++++++++++++++++++++++++++++++++$";
 			if(stkinfo != null){
 				for(Index_Info ind : stkinfo) {
 					
@@ -725,12 +725,12 @@ class ServerClientThread extends Thread {
 					result += String.valueOf(ind.get_stock_price());
 					result += "$Index Domain ID: ";
 					result += String.valueOf(ind.get_dom_id());
-					result += "$Index Domain Name";
+					result += "$Index Domain Name: ";
 					result += ind.get_domain_name();
 					result += "$Index Quantity: ";
 					result += String.valueOf(ind.get_stock_quant());
 					result += " ";
-					result +="$++++++++++++++++++++++++++++++++++$";
+					result +="$++++++++++++++++++++++++++++++++++++++++$";
 					
 				}
 			

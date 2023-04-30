@@ -29,7 +29,7 @@ public class Client {
 			if(register.equals("y")){
 				System.out.print("Account ID : ");
 				String acc_id = sc.next();
-				System.out.print("Password :");
+				System.out.print("Password : ");
 				String pass = sc.next();
 
         clientMessage = "1 "+acc_id+" "+pass;
@@ -190,7 +190,7 @@ public class Client {
 		}
 
     String[] msg;
-		System.out.println("1.Stock Analysis\n2.Buy Stocks\n3.Sell Stocks\n4. Market Trends\n5.Transaction History\n6. Index\n9. Exit");
+		System.out.println("1. Stock Analysis\n2. Buy Stocks\n3. Sell Stocks\n4. Market Trends\n5. Transaction History\n6. Index\n7. Exit");
 		System.out.print("Usecase Type : ");
 
 		int usecaseType = sc.nextInt();
